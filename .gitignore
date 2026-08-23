@@ -11,3 +11,9 @@ coverage/
 # than node_modules does.
 supabase/.temp/
 supabase/.branches/
+relay/supabase/.temp/
+
+!.env.example
+
+.gitignore
+pnpm-lock.yaml
