@@ -11,10 +11,10 @@ one to the file you are editing wins; it adds to this file rather than replacing
 
 ## 1. What this is
 
-**everywhere.app** is a web2 layer that adapts itself to any website. It ships as a
+**ElseWeb** is a web2 layer that adapts itself to any website. It ships as a
 Manifest V3 Chrome extension. The MVP target is x.com.
 
-When a user has the extension installed, they see an "share with everywhere" control
+When a user has the extension installed, they see a "share with ElseWeb" control
 next to x.com's own composer. The extension adapts its own UI into whatever page is
 open. Content shared through that control **never reaches x.com** — it is written to
 our own service. Every other user running the extension sees that content while they
@@ -40,7 +40,7 @@ writing code.
    any time, and single-relay operation is the degenerate case of a set of one — never a
    separate code path. No relay URL, key, or SDK call outside `relay/` and the configured
    transport.
-4. **No participant is privileged by the protocol.** everywhere.app's own relay is a relay
+4. **No participant is privileged by the protocol.** ElseWeb's own relay is a relay
    like any other. Our product decisions — an attestation-gated feed, a paid membership —
    are expressed with mechanisms available to everyone, so a community client can make
    different choices against the same network.
@@ -55,7 +55,7 @@ writing code.
 | Path | Contains | Does not contain |
 |---|---|---|
 | `apps/extension` | MV3 extension: WXT entrypoints, content script, background worker, popup/options, plain Svelte UI | SvelteKit, site selectors, protocol schemas, relay logic |
-| `apps/web` | everywhere.app site: SvelteKit — landing, docs, feed, the published relay standard | Extension UI, relay logic |
+| `apps/web` | ElseWeb site: SvelteKit — landing, docs, feed, the published relay standard | Extension UI, relay logic |
 | `packages/protocol` | `SPEC.md` and its implementation: event schemas, canonical serialization, crypto, proof-of-work, page identity | Browser APIs, network calls, storage |
 | `packages/client` | Relay pool, publishing, reading and merging, key management, ranking — everything a client does that is not UI | DOM, platform storage APIs, site selectors |
 | `packages/adapters` | Per-site adapters (x.com + generic fallback) | Network calls, storage, extension internals |

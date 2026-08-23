@@ -1,14 +1,14 @@
-# everywhere.app relay protocol — v1 (draft)
+# ElseWeb relay protocol — v1 (draft)
 
 Normative specification of the wire contract between a client and a relay.
 
 This document is the source of truth for the federation contract. Anything published on
-everywhere.app describing the relay standard is derived from this file, and the two are
+elseweb.app describing the relay standard is derived from this file, and the two are
 updated in the same pull request.
 
 **Implementing the endpoints in §10 is sufficient to run a relay.** Nothing in this
 document depends on Supabase, on our reference implementation in `relay/`, or on
-everywhere.app being involved at all.
+ElseWeb being involved at all.
 
 The key words MUST, MUST NOT, SHOULD, SHOULD NOT and MAY are used in the RFC 2119 sense.
 
@@ -27,7 +27,7 @@ Two consequences that govern the whole design:
 
 - A relay MUST be free to be stricter or looser than any other relay without breaking
   clients.
-- **No participant is privileged by the protocol.** everywhere.app's own relay is a relay
+- **No participant is privileged by the protocol.** ElseWeb's own relay is a relay
   like any other; its feed policy is expressed with the same mechanisms available to
   everyone, and a different client can make different choices (§13).
 
@@ -492,7 +492,7 @@ privileged relay:
   filter and build its own view from page queries.
 
 This is how an attestation-gated feed and an open one coexist without either being
-special. everywhere.app's own relay gates its feed on a `membership` claim from its
+special. ElseWeb's own relay gates its feed on a `membership` claim from its
 issuer; a different client, pointed at a different relay or configured with a different
 trusted-issuer list, produces a different feed from the same protocol.
 
@@ -596,7 +596,7 @@ mainly because of them.
 
 ## A.3 Attestation-gated feeds and what payment actually buys
 
-everywhere.app gates its own feed on a paid membership claim. Payment is the strongest
+ElseWeb gates its own feed on a paid membership claim. Payment is the strongest
 Sybil resistance available to us: it is costly, hard to automate at volume, and it borrows
 the fraud tooling of the payment network.
 
@@ -615,7 +615,7 @@ The structural point matters more than the amount: because membership is an
 **issuer-signed attestation** rather than a private list on our relay, the protocol stays
 neutral. Our feed is a filter anyone can express, other issuers can exist, and a community
 client can choose a different trusted-issuer list — including none — and get an open feed
-from the same network. Had we made the feed a privilege of our own relay, everywhere.app
+from the same network. Had we made the feed a privilege of our own relay, ElseWeb
 would be a federated protocol with a centralized product bolted through it.
 
 ## A.4 Attacks named, and what answers them

@@ -11,7 +11,7 @@ Read the root `AGENTS.md` first.
 `SPEC.md` in this directory is the wire contract. Code here implements it; it does
 not define it. If code and spec disagree, the spec is right and the code is a bug.
 
-Anything published on everywhere.app describing the relay standard is derived from
+Anything published on elseweb.app describing the relay standard is derived from
 `SPEC.md`, and the two are updated in the same PR.
 
 ## Purity
@@ -70,7 +70,7 @@ definition, no price. Those are each relay's policy, discovered at runtime from 
 document. A constant like `MIN_DIFFICULTY` in this package is a design error — it
 would make every relay in the federation obey our configuration.
 
-It also names no relay and no issuer. everywhere.app's membership issuer is a trusted
+It also names no relay and no issuer. ElseWeb's membership issuer is a trusted
 issuer *for our clients*, configured at runtime — never a constant here. The moment a
 specific issuer key is hardcoded in this package, the protocol has a favourite.
 

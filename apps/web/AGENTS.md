@@ -1,6 +1,6 @@
 # AGENTS.md — apps/web
 
-The everywhere.app website. Read the root `AGENTS.md` first.
+The ElseWeb website. Read the root `AGENTS.md` first.
 
 Stack: **SvelteKit**, plain JavaScript.
 
@@ -13,7 +13,7 @@ assume `adapter-static` is the target.
 
 In scope:
 
-- Landing page — what everywhere.app is, how to install the extension.
+- Landing page — what ElseWeb is, how to install the extension.
 - Documentation.
 - **The feed** — the cross-page stream, and the threads, replies and votes on it. It
   reads through `packages/client` like every other surface; no relay logic is written

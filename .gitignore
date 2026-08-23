@@ -6,3 +6,8 @@ build/
 .env.*
 coverage/
 .DS_Store
+
+# Supabase CLI machine-local state. Not secret, but no more belongs in the repo
+# than node_modules does.
+supabase/.temp/
+supabase/.branches/

@@ -5,7 +5,7 @@ migrations and RLS policies. Read the root `AGENTS.md` first.
 
 ## The point of this directory
 
-everywhere.app is federated. This relay is *one* implementation of a contract, not the
+ElseWeb is federated. This relay is *one* implementation of a contract, not the
 architecture. Anyone should be able to run their own relay and have the extension talk
 to it by changing a URL in the extension's settings.
 
@@ -79,7 +79,7 @@ raises cost and bounds damage. See Appendix A of the spec before changing any of
 
 ## Membership issuer
 
-This relay also issues the `membership` attestation that gates everywhere.app's feed.
+This relay also issues the `membership` attestation that gates ElseWeb's feed.
 It is an ordinary issuer-signed claim per §8 of the spec, and that shape is the whole
 point: any third party can verify it with the issuer's public key, and any client can
 choose a different trusted-issuer list — or none — and get a different feed from the
