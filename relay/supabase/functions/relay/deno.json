@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "@elseweb/protocol": "../../../../packages/protocol/src/index.js",
+    "valibot": "npm:valibot@1.4.2"
+  }
+}

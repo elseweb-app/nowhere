@@ -3,3 +3,4 @@ project_id = "rmzdyuviqckvslibofaf"
 [functions.relay]
 verify_jwt = false
 entrypoint = "./functions/relay/index.js"
+import_map = "./functions/relay/deno.json"
