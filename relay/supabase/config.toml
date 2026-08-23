@@ -1,0 +1,4 @@
+project_id = "rmzdyuviqckvslibofaf"
+
+[functions.relay]
+verify_jwt = false
