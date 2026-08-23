@@ -6,6 +6,14 @@ the slowest-moving, most carefully changed code in the repo.
 
 Read the root `AGENTS.md` first.
 
+## SPEC.md is normative
+
+`SPEC.md` in this directory is the wire contract. Code here implements it; it does
+not define it. If code and spec disagree, the spec is right and the code is a bug.
+
+Anything published on everywhere.app describing the relay standard is derived from
+`SPEC.md`, and the two are updated in the same PR.
+
 ## Purity
 
 This package is pure data and pure functions.
@@ -25,7 +33,15 @@ If a function here needs to know how something is sent, it is in the wrong packa
   hardest correctness problem in the product: normalization must strip fragments,
   tracking parameters and other noise, while keeping parameters that genuinely identify
   a distinct page. Every normalization rule needs a test with a real-world URL.
-- **Identity and signing** — how an author is represented and how a payload is attested.
+- **Canonical serialization** — the single byte encoding that signatures and
+  proof-of-work are computed over. RFC 8785 (JCS), integers only, absent fields
+  omitted rather than `null`. Two implementations that serialize differently produce
+  signatures that will not verify, and the cause is very hard to find. Never change
+  this without treating it as a breaking protocol change.
+- **Identity and signing** — Ed25519 over SHA-256, both reachable through WebCrypto
+  so a client needs no crypto dependency. Do not introduce one.
+- **Proof of work** — mine and verify. Difficulty is leading zero bits of the payload
+  id. Verification is stateless by design; keep it that way.
 - **Schema version** — the version field carried by every payload.
 
 ## Changing a schema
@@ -40,7 +56,21 @@ If a function here needs to know how something is sent, it is in the wrong packa
 - Every schema change updates the relay standard documentation in `apps/web` and the
   contract in `relay/AGENTS.md` in the same PR.
 
+## No thresholds here
+
+This package carries no numbers: no proof-of-work difficulty, no quota, no tier
+definition. Those are each relay's policy, discovered at runtime from its policy
+document. A constant like `MIN_DIFFICULTY` in this package is a design error — it
+would make every relay in the federation obey our configuration.
+
 ## Tests
 
-This is the one package where test coverage is not optional. Every schema gets a test
-for both an accepted and a rejected payload. Every URL normalization rule gets a test.
+This is the one package where test coverage is not optional.
+
+- Every schema gets a test for both an accepted and a rejected payload.
+- Every URL normalization rule gets a test with a real-world URL.
+- **Canonical serialization ships test vectors**: hand-written payloads with their
+  expected canonical bytes, `id`, and `sig`. Someone writing a second relay checks
+  their implementation against these, so a vector is a published commitment — adding
+  one is routine, changing one is a breaking change.
+- Proof-of-work: mine-then-verify round trips, and `created_at` freshness boundaries.

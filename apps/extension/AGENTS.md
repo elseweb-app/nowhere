@@ -54,6 +54,44 @@ Content script <-> background messages are validated with schemas from
 `packages/protocol` on both send and receive. An unrecognized or invalid message is
 rejected and logged, never acted on.
 
+## Sharing: proof of work and rejections
+
+Publishing a share means mining proof-of-work first, per
+`packages/protocol/SPEC.md`. Required difficulty is not ours to pick — read it from
+the relay's policy document and its per-key endpoint, cache it, and never hardcode a
+value.
+
+- Mining MUST be cancellable and MUST show progress. Sharing is user-initiated, so a
+  short wait is acceptable; a UI that appears to hang is not.
+- Stop at a bounded effort and surface a clear error rather than spinning forever.
+- Mine immediately before submitting. A mined payload goes stale — never stash one
+  and resubmit it later.
+- Handle every rejection code the spec defines, distinctly. `POW_INSUFFICIENT` is one
+  re-mine at the returned difficulty; `QUOTA_EXCEEDED` is a wait and **not** a re-mine;
+  `SIGNATURE_INVALID` and `SCHEMA_INVALID` are our bugs and must not be retried.
+  A blind retry loop against a relay is the failure mode to avoid here.
+
+## Rendering: a flood only works if it is displayed
+
+The relay bounds what it returns, and we bound it again. Neither side relies on the
+other.
+
+- Never render shares in raw chronological order.
+- Cap how many shares a page renders.
+- Enforce author diversity: one `pubkey` cannot dominate a page's view.
+- Rank with key tier and age, engagement, and recency, so an unknown key with no
+  engagement sorts to the bottom.
+
+## Keys
+
+The user's persistent key is generated client-side and never leaves the device.
+Ephemeral-mode shares use a single-use key. Ephemeral mode is a privacy valve, not a
+security control — a relay cannot tell an ephemeral key from a brand-new persistent
+one, so never build a guarantee on it.
+
+A persistent key lets a relay link all of a user's shares together. Say so in the UI.
+That cost was chosen deliberately; it is not to be quietly imposed.
+
 ## Configuration
 
 The relay URL is user-configurable and read from `storage`. It is never a literal in

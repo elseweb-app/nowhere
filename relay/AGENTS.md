@@ -20,10 +20,9 @@ the wrong change.
 
 ## The contract
 
-The edge function exposes the endpoints the extension needs: publishing a shared item,
-and fetching the items for a page identity. Each endpoint's method, request shape and
-response shape is defined by the schemas in `packages/protocol` — the relay does not
-invent its own payload shapes.
+The endpoints, payloads, verification order, policy document and rejection codes are
+specified in `packages/protocol/SPEC.md`. This directory implements that spec; it does
+not define it and does not invent its own payload shapes.
 
 Rules:
 
@@ -33,10 +32,34 @@ Rules:
   never re-derives it differently.
 - Responses are the protocol's shapes, and nothing more. No leaking database column
   names, internal ids, or Postgres error text.
-- Errors are a stable, documented shape. Other relays must be able to produce them.
+- Errors use the rejection codes from the spec, each with the extra fields that code
+  is defined to carry. A bare `400` is not conformant: a client that cannot tell the
+  cases apart will either retry forever or give up on a recoverable error.
+- The policy document is served and kept truthful. A client that reads it and complies
+  must not then be rejected — a stale policy document is a real bug, not cosmetic.
 - Changing the contract means changing `packages/protocol` and the published standard in
   `apps/web` in the same PR. See the breaking-change rule in
   `packages/protocol/AGENTS.md`.
+
+## Anti-flood: this is where policy lives
+
+Keys are free to create, so identity alone carries no weight. The spec gives us the
+mechanisms; the numbers are ours, and they are **configuration, never literals in
+code**.
+
+- Keep a record per `pubkey`: first seen, share count, last share, reports, tier.
+- A new key sits in the lowest tier — small quota, high required proof-of-work.
+  Tier rises with age and a clean record; quota rises and difficulty falls with it.
+- Enforce quota per `pubkey` **and** per `(pubkey, page_id)`. Content is page-scoped,
+  so a per-page cap is what actually bounds a flood, and it is nearly free to apply.
+- Verify schema, freshness, id, signature and proof-of-work **before** any quota
+  lookup, in the order the spec gives. An unauthenticated caller must not be able to
+  cause database work.
+- `GET /shares` returns bounded, diversified results: one `pubkey` must not be able to
+  occupy an unbounded share of one page's response.
+
+None of this prevents Sybil attacks — nothing can, in a permissionless network. It
+raises cost and bounds damage. See Appendix A of the spec before changing any of it.
 
 ## Database
 

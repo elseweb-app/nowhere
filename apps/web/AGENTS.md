@@ -10,9 +10,12 @@ In scope:
 
 - Landing page — what everywhere.app is, how to install the extension.
 - Documentation.
-- **The published relay standard** — the HTTP contract from `relay/AGENTS.md` written up
-  for people who want to run their own relay. This is the site's most important page;
-  federation only works if the contract is public and readable.
+- **The published relay standard** — written up for people who want to run their own
+  relay. This is the site's most important page; federation only works if the contract
+  is public and readable. Its source of truth is `packages/protocol/SPEC.md`: the page
+  is derived from the spec, never the other way round, and both change in the same PR.
+  A published standard that has drifted from the spec is worse than none, because
+  someone will implement a relay against it.
 
 Out of scope:
 
