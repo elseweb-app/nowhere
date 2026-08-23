@@ -118,4 +118,29 @@ function normalizeFunctionRequest(request) {
   return new Request(url, request)
 }
 
-Deno.serve((request) => app.handle(normalizeFunctionRequest(request)))
+function corsResponse(response) {
+  const headers = new Headers(response.headers)
+  headers.set('Access-Control-Allow-Origin', '*')
+  headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+  headers.set('Access-Control-Allow-Headers', 'content-type')
+  return new Response(response.body, {
+    status: response.status,
+    headers,
+  })
+}
+
+Deno.serve(async (request) => {
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'content-type',
+      },
+    })
+  }
+
+  const response = await app.handle(normalizeFunctionRequest(request))
+  return corsResponse(response)
+})
