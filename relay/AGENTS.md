@@ -55,8 +55,15 @@ code**.
 - Verify schema, freshness, id, signature and proof-of-work **before** any quota
   lookup, in the order the spec gives. An unauthenticated caller must not be able to
   cause database work.
-- `GET /shares` returns bounded, diversified results: one `pubkey` must not be able to
-  occupy an unbounded share of one page's response.
+- Every listing endpoint returns bounded, diversified results: one `pubkey` must not be
+  able to occupy an unbounded share of any response.
+- **The feed is where page-scoping stops helping.** A page query is naturally narrow; a
+  feed is cross-page by definition, so the per-`(pubkey, page_id)` quota does not
+  constrain it at all. The feed needs its own volume and diversity bounds, plus the
+  attestation gate below.
+- Votes are served raw as well as aggregated. An aggregate nobody can recount is an
+  aggregate this relay could have invented, and in a federation that has to be checkable
+  from outside.
 
 None of this prevents Sybil attacks — nothing can, in a permissionless network. It
 raises cost and bounds damage. See Appendix A of the spec before changing any of it.
@@ -70,10 +77,32 @@ raises cost and bounds damage. See Appendix A of the spec before changing any of
   bug, not a to-do.
 - Keep the schema close to the protocol's shapes so mapping stays trivial.
 
+## Membership issuer
+
+This relay also issues the `membership` attestation that gates everywhere.app's feed.
+It is an ordinary issuer-signed claim per §8 of the spec, and that shape is the whole
+point: any third party can verify it with the issuer's public key, and any client can
+choose a different trusted-issuer list — or none — and get a different feed from the
+same network. A private members table that only we can check would make this relay
+structurally privileged, which §1 of the spec forbids.
+
+- An attestation states **membership, not identity**. Never put a name, an email, a
+  payment reference or any other personal data in one. Payment records stay in the
+  account system and never touch the network.
+- Attestations are short-lived and reissued while membership holds. Revocation is by
+  simply not reissuing, which is what makes a refund, a chargeback or an abuse finding
+  take effect without a revocation list anyone must be able to reach.
+- Payment raises the cost of a Sybil fleet sharply but does not remove it — stolen cards
+  cost an attacker nothing and accounts resell. Quotas, proof-of-work, ranking and
+  diversity stay in force underneath the gate. See Appendix A.3 of the spec.
+
 ## Keys and secrets
 
 - The `service_role` key exists only inside the edge function's environment. It never
   appears in client code, in a build artifact, or in this repo.
+- The **issuer signing key** is held with the same care as `service_role`. Whoever holds
+  it can mint memberships, so it never leaves the function environment and never appears
+  in a migration, a log line, or a response body.
 - The anon key is the only key clients see.
 - `.env` files are not committed. Document required variables by name in the local
   README, never with real values.

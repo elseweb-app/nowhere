@@ -28,29 +28,43 @@ Flow: `shared content -> relay -> other extension users on the same page`.
 
 ## 2. Non-negotiables
 
-These four define the product. If a change would break one of them, stop and ask
-before writing code.
+These define the product. If a change would break one of them, stop and ask before
+writing code.
 
 1. **Shared content never goes to the host site.** Not to x.com, not to any other host.
    The host site's own posting/sharing flow is never invoked, prefilled, or triggered.
 2. **The host page's DOM is not polluted.** Everything injected lives inside a shadow
    root. No global CSS, no writing into the host's class/id namespace, no mutation of
    host elements beyond an anchor point needed to mount.
-3. **The relay address is never hardcoded.** A user must be able to point the extension
-   at a different relay. No Supabase URL, key, or SDK call outside `relay/` and the
-   configured transport layer.
-4. **Site adapters describe behavior, not data.** A site with no adapter falls back to
+3. **Clients speak to a set of relays, never one.** The relay set is user-editable at
+   any time, and single-relay operation is the degenerate case of a set of one — never a
+   separate code path. No relay URL, key, or SDK call outside `relay/` and the configured
+   transport.
+4. **No participant is privileged by the protocol.** everywhere.app's own relay is a relay
+   like any other. Our product decisions — an attestation-gated feed, a paid membership —
+   are expressed with mechanisms available to everyone, so a community client can make
+   different choices against the same network.
+5. **Identity is the keypair, and it belongs to the user.** Keys are generated
+   extractable so a user can carry one identity across the extension, the site and mobile.
+   A private key is never sent to a server, encrypted or not.
+6. **Site adapters describe behavior, not data.** A site with no adapter falls back to
    the generic adapter. The extension degrades on unknown sites; it never dies on them.
 
 ## 3. Repo map
 
 | Path | Contains | Does not contain |
 |---|---|---|
-| `apps/extension` | MV3 extension: WXT entrypoints, content script, background worker, popup/options, plain Svelte UI | SvelteKit, site selectors, protocol schemas |
-| `apps/web` | everywhere.app site: SvelteKit — landing, docs, the published relay standard | Extension UI, extension code |
-| `packages/protocol` | Payload schemas, page identity, versioning — the federation contract | Browser APIs, network calls, Supabase |
+| `apps/extension` | MV3 extension: WXT entrypoints, content script, background worker, popup/options, plain Svelte UI | SvelteKit, site selectors, protocol schemas, relay logic |
+| `apps/web` | everywhere.app site: SvelteKit — landing, docs, feed, the published relay standard | Extension UI, relay logic |
+| `packages/protocol` | `SPEC.md` and its implementation: event schemas, canonical serialization, crypto, proof-of-work, page identity | Browser APIs, network calls, storage |
+| `packages/client` | Relay pool, publishing, reading and merging, key management, ranking — everything a client does that is not UI | DOM, platform storage APIs, site selectors |
 | `packages/adapters` | Per-site adapters (x.com + generic fallback) | Network calls, storage, extension internals |
-| `relay/` | Reference relay: edge function, migrations, RLS policies | Client code |
+| `relay/` | Reference relay: edge function, migrations, RLS policies, membership issuer | Client code |
+
+A mobile app arrives in a later phase as a Capacitor wrapper around `apps/web`. It is not
+a fourth implementation: it consumes `packages/client` exactly as the other two do. This
+is the reason client logic lives in a package rather than in `apps/extension`, and it is
+why `apps/web` must stay statically buildable.
 
 ## 4. Setup and commands
 
@@ -109,13 +123,15 @@ general-purpose utility library (lodash and friends).
 Dependency direction is one-way and must stay that way:
 
 ```
-apps/*  ->  packages/*
+apps/*             ->  packages/*
+packages/client    ->  packages/protocol      (only this direction)
 packages/adapters  ->  packages/protocol      (only this direction)
 packages/protocol  ->  nothing internal
 ```
 
-`packages/adapters` does not know the extension exists. `packages/protocol` does not
-know a browser exists.
+`packages/adapters` does not know the extension exists. `packages/client` does not know
+which app is hosting it — the platform's storage and its UI are injected as ports.
+`packages/protocol` does not know a browser exists.
 
 ## 8. Security and privacy
 

@@ -26,8 +26,9 @@ If a function here needs to know how something is sent, it is in the wrong packa
 
 ## What lives here
 
-- **Payload schemas** — the shape of a shared item as it travels to and from a relay.
-  Defined with valibot.
+- **Event schemas** — everything on the network is an event, discriminated on `kind`.
+  `share`, `reply` and `vote` are the same envelope with different fields; a new kind
+  is a new variant, not a new payload type. Defined with valibot's discriminated union.
 - **Page identity** — the function that turns a URL into the id two users must both
   arrive at in order to see each other's content on the same page. This is the single
   hardest correctness problem in the product: normalization must strip fragments,
@@ -42,7 +43,13 @@ If a function here needs to know how something is sent, it is in the wrong packa
   so a client needs no crypto dependency. Do not introduce one.
 - **Proof of work** — mine and verify. Difficulty is leading zero bits of the payload
   id. Verification is stateless by design; keep it that way.
-- **Schema version** — the version field carried by every payload.
+- **Attestations** — publicly verifiable claims about a key. An attestation anyone can
+  check with public information only; a claim verifiable solely by the issuing relay is
+  that relay's private database and does not belong on the wire.
+- **Key transfer envelope** — the encrypted format that moves an identity between
+  devices. Keys are generated **extractable**; a non-extractable key strands its owner
+  and cannot be fixed after issuance.
+- **Schema version** — the version field carried by every event.
 
 ## Changing a schema
 
@@ -56,12 +63,16 @@ If a function here needs to know how something is sent, it is in the wrong packa
 - Every schema change updates the relay standard documentation in `apps/web` and the
   contract in `relay/AGENTS.md` in the same PR.
 
-## No thresholds here
+## No thresholds, and no privileged parties
 
 This package carries no numbers: no proof-of-work difficulty, no quota, no tier
-definition. Those are each relay's policy, discovered at runtime from its policy
+definition, no price. Those are each relay's policy, discovered at runtime from its policy
 document. A constant like `MIN_DIFFICULTY` in this package is a design error — it
 would make every relay in the federation obey our configuration.
+
+It also names no relay and no issuer. everywhere.app's membership issuer is a trusted
+issuer *for our clients*, configured at runtime — never a constant here. The moment a
+specific issuer key is hardcoded in this package, the protocol has a favourite.
 
 ## Tests
 
@@ -74,3 +85,8 @@ This is the one package where test coverage is not optional.
   their implementation against these, so a vector is a published commitment — adding
   one is routine, changing one is a breaking change.
 - Proof-of-work: mine-then-verify round trips, and `created_at` freshness boundaries.
+- Vote replacement: later `created_at` wins, and the `id` tie-break is deterministic.
+  Two relays that disagree on which vote counts is a network split.
+- Attestations: a valid one verifies, an expired one fails, and one signed by an
+  untrusted issuer verifies cryptographically but is not trusted — those are different
+  outcomes and the tests must tell them apart.
