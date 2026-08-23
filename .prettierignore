@@ -1,0 +1,11 @@
+node_modules
+dist
+build
+.wxt
+coverage
+pnpm-lock.yaml
+*.md
+
+# Generated from the spec by an out-of-repo generator. Reformatting them here would
+# break the regenerate-and-diff check that proves nobody edited a vector by hand.
+packages/*/test/vectors/*.json

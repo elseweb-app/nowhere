@@ -97,7 +97,9 @@ Every object on the network is an **event**. Sharing, replying and voting differ
 | `identity_mode` | `"persistent"` \| `"ephemeral"` | yes | See §9 |
 | `nonce` | integer | yes | Varied during mining (§7.1) |
 | `attestations` | array | yes | Publicly verifiable claims about `pubkey` (§8). MAY be empty |
-| `page_id` | hex string | by kind | Normalized page identity (§6) |
+| `page_id` | hex string | by kind | Target identity, the join key (§6) |
+| `page_url` | string | by kind | The canonical target URL `page_id` was derived from (§6) |
+| `anchor` | object | no | Sub-content within the page, `{ "id": "<string>" }` (§6) |
 | `parent_id` | hex string | by kind | Direct parent event |
 | `root_id` | hex string | by kind | Thread root event |
 | `target_id` | hex string | by kind | Event being voted on |
@@ -130,15 +132,24 @@ checked before any quota lookup, so an unauthenticated caller cannot cause datab
 
 ### 5.1 `share`
 
-Requires `page_id`. `content` carries the shared material.
+Requires `page_id` and `page_url`. `anchor` is present when the share targets sub-content
+within the page (§6).
+
+`content` is `{ "text": "<string>" }`.
+
+`content.media` is **reserved** and MUST be absent in v1. It is an optional field, so
+introducing it later is not a breaking change. Appendix A.6 records what it has to look
+like to survive federation.
 
 ### 5.2 `reply`
 
-Requires `parent_id`, `root_id`, and `page_id`.
+Requires `parent_id`, `root_id`, `page_id` and `page_url`. `content` is
+`{ "text": "<string>" }`.
 
 - `parent_id` is the event replied to, which MAY itself be a reply.
 - `root_id` is the `share` at the top of the thread, so a whole thread is one query.
-- `page_id` is denormalized from the root, so a page query returns the thread with it.
+- `page_id`, `page_url` and `anchor` are denormalized from the root, so a page query
+  returns the thread along with it. They MUST match the root's values.
 
 A relay MAY cap thread depth and MAY reject a reply whose parent it does not hold.
 A client MUST render a reply whose parent is missing as an orphan rather than dropping
@@ -158,18 +169,110 @@ Requires `target_id`. `content` is `{ "value": 1 }` or `{ "value": -1 }`.
   and therefore the highest-leverage target for a Sybil attack; weight them by voter tier
   and attestations (§14).
 
-## 6. Page identity
+## 6. Target identity
 
-`page_id` is an opaque hex string derived from the page's URL by this package's
-normalization function. Two users on the same page MUST derive the same `page_id`, or
-they cannot see each other — the product's core correctness requirement.
+Two users looking at the same thing MUST derive the same target identity, or they cannot
+see each other. This is the product's core correctness requirement.
 
-The derivation rules are specified separately in this package and are **part of the
-protocol**. Changing them changes which users can see each other, which partitions the
-network. A change to normalization is a breaking protocol change and requires a version
-bump.
+A target has three levels:
 
-A relay MUST treat `page_id` as opaque. It MUST NOT re-derive, rewrite, or interpret it.
+| Level | Where the event was made | What it binds to |
+|---|---|---|
+| 0 | A social network's main feed | The site root — `https://x.com/`, not `/home` |
+| 1 | A piece of content reachable by URL | That content's normalized URL |
+| 2 | Sub-content inside that content — a post in a thread, a comment | The normalized URL plus the sub-content's id |
+
+Three fields express it:
+
+- **`page_url`** — the canonical target URL, after normalization. Carried on the wire
+  because `page_id` is a hash: a feed cannot show *where* something was shared, and a
+  reader cannot link back, from a hash alone.
+- **`page_id`** — `hex(SHA-256(page_url))`. The join key.
+- **`anchor`** — optional, `{ "id": "<string>" }`. Present at level 2. It is part of the
+  join key *and* it is what tells a client where on the page to render.
+
+### 6.1 Who produces the canonical URL
+
+Normalization has a generic part and a site-specific part, and they live in different
+places.
+
+The generic part is defined here and applies everywhere. In order:
+
+1. Only `http` and `https` are accepted. Any other scheme is rejected, not normalized.
+2. Scheme and host are lowercased. A trailing dot on the host is removed. An
+   internationalized host is converted to its ASCII (punycode) form, so that a user who
+   typed the unicode name and one who typed the encoded name land on the same target.
+   Path case is **preserved** — paths are case-sensitive on most origins.
+3. Userinfo (`user:pass@`) is removed.
+4. The default port for the scheme is removed; any other port is kept.
+5. The fragment is removed, empty or not.
+6. Dot segments in the path are resolved. An empty path becomes `/`.
+7. Percent-encoding is normalized: unreserved characters are decoded, everything else keeps
+   its escape with uppercase hex digits.
+8. Tracking parameters are removed: any parameter whose name begins with `utm_`, plus
+   `fbclid`, `gclid`, `gbraid`, `wbraid`, `msclkid`, `dclid`, `yclid`, `mc_cid`, `mc_eid`,
+   `igshid`, `ref_src`, `ref_url`, `_ga`. The list is deliberately conservative: a parameter
+   that is tracking on one site and meaningful on another belongs to that site's adapter,
+   not here.
+9. A parameter given without a value is normalized to `name=`, so `?a` and `?a=` are the
+   same target.
+10. Remaining query parameters are sorted by name, then by value, **comparing UTF-16 code
+    units** — the same ordering §3 uses for object keys. Collation must not be
+    locale-aware: `?B=1&a=2` sorts `B` before `a`, and an implementation that sorted them
+    the other way would silently stop agreeing with everyone else. Sorting exists so that
+    parameter order cannot split the network; an ambiguous sort would defeat it. A query
+    left empty loses its `?`.
+11. A trailing slash is significant and preserved. `…/foo` and `…/foo/` are different
+    targets, because on many origins they genuinely are.
+
+`http` and `https` are different targets. So are two paths differing only in case.
+
+The executable form of these rules is `test/vectors/target.json`. Where prose and vectors
+could be read differently, the vectors win — they are what a second implementation is
+checked against.
+
+The site-specific part cannot be. Nothing generic can know that `x.com/home` and
+`x.com/explore` are both the site's main feed and must collapse to `https://x.com/`, while
+`x.com/user/status/123` must not. That is site knowledge, so a **site adapter** supplies
+the canonical target URL and the anchor id, and this package normalizes what it is given.
+
+A conforming client that has no adapter for a site falls back to the generic normalization
+of the current URL, with no anchor. It will not agree with an adapter-equipped client about
+level 0 pages; it will agree about level 1.
+
+### 6.2 Anchor ids
+
+An anchor id MUST be derived from a durable identifier the host site itself exposes —
+the id in a permalink, a post id, a comment id. It MUST NOT be derived from DOM position,
+element index, ordering, or generated class names. A DOM-derived anchor is not stable
+across re-renders and is not stable between two users, which means the two of them silently
+stop sharing a target.
+
+An anchor id is opaque to the protocol and to relays. Only the adapter that produced it
+knows how to find the thing again.
+
+### 6.3 Verification and opacity
+
+A relay MUST treat `page_id` as opaque. It MUST NOT re-derive, rewrite, or interpret it —
+re-deriving would couple every relay to one normalization version, and a client running a
+different version would simply be rejected.
+
+Clients SHOULD verify that `page_id` equals the hash of `page_url` when rendering, and
+SHOULD treat a mismatch as untrustworthy. This catches a forged pairing without coupling
+relays to normalization.
+
+### 6.4 Changing normalization is breaking
+
+Changing either the generic rules or an adapter's canonical-URL rule changes which users
+can see each other, which partitions the network. It is a breaking protocol change and
+requires a version bump.
+
+### 6.5 Privacy cost, stated plainly
+
+`page_url` puts the full URL of every page a user shares on in front of every relay they
+publish to. This is a real cost and it is not softened by `page_id` being a hash: hashes of
+known URLs are trivially precomputed, so the hash never provided meaningful protection.
+Users MUST be told that sharing on a page reveals that page to the relays they publish to.
 
 ## 7. Proof of work
 
@@ -242,10 +345,29 @@ relay's private database, and it does not belong on the wire.
 ```
 
 - `subject` MUST equal the event's `pubkey`.
-- A verifier checks `sig` against `issuer`, then checks `expires_at` against now. Nothing
-  else is required — no call to the issuer, no shared secret.
+- The attestation is signed the same way an event is: `sig` covers
+  `SHA-256(canonical bytes)` of the attestation without its `sig`, using the canonical
+  form of §3. It is not signed over the raw bytes.
+- Verification needs only public information — no call to the issuer, no shared secret.
 - Whether an issuer is *trusted* is not a protocol question. Each client and relay keeps
-  its own trusted-issuer list (§13).
+  its own trusted-issuer list (§13). An empty or absent list trusts nobody; that is the
+  safe default and MUST NOT be read as trusting everybody.
+
+**Check order is normative**, because the reason a verifier reports changes what a client
+does next. Verify in this order and return the first failure:
+
+1. `type` is one this verifier supports — otherwise `unsupported_type`;
+2. `sig` verifies against `issuer` — otherwise `signature_invalid`;
+3. `issuer` is in the trusted list — otherwise `untrusted_issuer`;
+4. `expires_at` is in the future — otherwise `expired`;
+5. `subject` matches the event's `pubkey` — otherwise `subject_mismatch`.
+
+Signature is checked before trust so that "cryptographically valid but not trusted here"
+is a distinguishable outcome — the same attestation may be perfectly good at another
+relay. Trust is checked before expiry so that a client is not told to go refresh an
+attestation from an issuer that would be rejected anyway.
+
+**Expiry is exclusive**: `now == expires_at` is expired.
 
 **An attestation states membership, not identity.** It MUST NOT carry a name, an email
 address, a payment reference, or any other personal data. Whatever the issuer did to
@@ -291,7 +413,7 @@ Users MUST be told that a persistent key lets a relay link all of their events t
 | `GET` | `/policy` | Policy document (§11) |
 | `GET` | `/keys/{pubkey}` | Required difficulty and remaining quota for one key |
 | `POST` | `/events` | Publish one event (§4) |
-| `GET` | `/events?page_id=…` | Events for one page, including its threads |
+| `GET` | `/events?page_id=…` | Events for one page, including its threads. Optional `&anchor_id=` narrows to one anchor |
 | `GET` | `/events?target_id=…` | Vote events for one target, for independent recount |
 | `GET` | `/feed?cursor=…` | The relay's feed (§13) |
 
@@ -415,7 +537,8 @@ code on the source device and scanned by the target.
   expiry timestamp gives no protection at all. Entropy is the only thing defending a
   captured envelope.
 - `expires_at` bounds how long a target device will accept the envelope. It defends
-  against a stale QR being reused; it does not defend against offline cracking.
+  against a stale QR being reused; it does not defend against offline cracking. Expiry is
+  exclusive, matching §8.1: `now == expires_at` is expired.
 - The QR MUST be displayed only while transfer is in progress, and the source device
   SHOULD warn that anyone who captures both the code and the QR gains the identity
   permanently — a key cannot be rotated without losing its accrued standing.
@@ -525,7 +648,24 @@ would be a federated protocol with a centralized product bolted through it.
 - **Non-extractable keys.** Better key hygiene in the browser, and fatal to device
   transfer. Rejected before any key exists, because it cannot be undone afterwards.
 
-## A.6 Three things to be honest about
+## A.6 Media, when it arrives
+
+`content.media` is reserved and absent in v1. It is recorded here because media is the
+first thing in this design that does not federate for free, and the shape has to be right
+the first time.
+
+An event is broadcast to several relays (§12), but an uploaded file sits on one. If the
+event carried a plain URL into the relay it was uploaded to, a reader coming from another
+relay sees a broken image, that relay could swap the file silently, and losing one relay
+loses the media for everyone.
+
+The shape that survives all three: the event carries the file's **SHA-256** plus a list of
+`sources` where it can be fetched. A client tries the sources and verifies what it gets
+against the hash, so a substituted file is detected rather than displayed; any relay may
+mirror the bytes and add itself as a source; and the media outlives the relay it was first
+uploaded to. Content addressing is what makes media as portable as the event carrying it.
+
+## A.7 Three things to be honest about
 
 1. **This does not solve Sybil.** It is economics, not cryptography: raise the cost of an
    attack above its value, and make the flood invisible even when a write succeeds. Any

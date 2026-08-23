@@ -1,0 +1,126 @@
+[
+  {
+    "name": "share, minimal, level 0 target",
+    "event": {
+      "v": 1,
+      "kind": "share",
+      "pubkey": "79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664",
+      "created_at": 1755900000,
+      "identity_mode": "persistent",
+      "nonce": 0,
+      "attestations": [],
+      "page_id": "326a645050274b9b922a7eb20fdf980542877aedb1858f5f84d4e8d8574c6710",
+      "page_url": "https://x.com/",
+      "content": {
+        "text": "merhaba"
+      }
+    },
+    "canonical": "{\"attestations\":[],\"content\":{\"text\":\"merhaba\"},\"created_at\":1755900000,\"identity_mode\":\"persistent\",\"kind\":\"share\",\"nonce\":0,\"page_id\":\"326a645050274b9b922a7eb20fdf980542877aedb1858f5f84d4e8d8574c6710\",\"page_url\":\"https://x.com/\",\"pubkey\":\"79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664\",\"v\":1}",
+    "id": "131cbadb7df3daaf6afeb487cccc6007d83447482d4997477f51d9358119eff8",
+    "sig": "ebc8f6981288c27cb9af10887e7d3ca53e0baa26490b56ccfc2d70a08f2d82f58d650f8e820bd299131fa7ff9fd0ef89e86685612224cc3b004ce216e6ca1b00"
+  },
+  {
+    "name": "share with anchor — an absent field and a present one are different events",
+    "event": {
+      "v": 1,
+      "kind": "share",
+      "pubkey": "79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664",
+      "created_at": 1755900000,
+      "identity_mode": "persistent",
+      "nonce": 0,
+      "attestations": [],
+      "page_id": "b09994f452ef118b0daac68877bc12db6fed896705c139df5d718c02f6c36138",
+      "page_url": "https://x.com/u/status/123",
+      "anchor": {
+        "id": "456"
+      },
+      "content": {
+        "text": "merhaba"
+      }
+    },
+    "canonical": "{\"anchor\":{\"id\":\"456\"},\"attestations\":[],\"content\":{\"text\":\"merhaba\"},\"created_at\":1755900000,\"identity_mode\":\"persistent\",\"kind\":\"share\",\"nonce\":0,\"page_id\":\"b09994f452ef118b0daac68877bc12db6fed896705c139df5d718c02f6c36138\",\"page_url\":\"https://x.com/u/status/123\",\"pubkey\":\"79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664\",\"v\":1}",
+    "id": "f7b8e1869a572ab8cee85a056e79a2608323ca824a307055c7d65b952c26f657",
+    "sig": "a113041495edf8798c16167d98b2b4421737023d98295cc69d1cff271d364336829a350ef2e0578ebdc15b17bfbc92f36e939a30cf72d66e1bb043c65f527507"
+  },
+  {
+    "name": "unicode is emitted raw as UTF-8, never escaped",
+    "event": {
+      "v": 1,
+      "kind": "share",
+      "pubkey": "79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664",
+      "created_at": 1755900000,
+      "identity_mode": "persistent",
+      "nonce": 0,
+      "attestations": [],
+      "page_id": "326a645050274b9b922a7eb20fdf980542877aedb1858f5f84d4e8d8574c6710",
+      "page_url": "https://x.com/",
+      "content": {
+        "text": "İstanbul çğüşiö 🌍"
+      }
+    },
+    "canonical": "{\"attestations\":[],\"content\":{\"text\":\"İstanbul çğüşiö 🌍\"},\"created_at\":1755900000,\"identity_mode\":\"persistent\",\"kind\":\"share\",\"nonce\":0,\"page_id\":\"326a645050274b9b922a7eb20fdf980542877aedb1858f5f84d4e8d8574c6710\",\"page_url\":\"https://x.com/\",\"pubkey\":\"79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664\",\"v\":1}",
+    "id": "4778eb8e26cd7c1c9908bcf670f821c30062d7a3ff68b6fb7c22bc732153df72",
+    "sig": "595b8621e4a31cad09a0d6526fa30731712bff9c5aea7b99517930d66d210737abe2307583c34a84f34e920979f2ecab7cd76d4b92936c01feeb336546def900"
+  },
+  {
+    "name": "string escaping: quote, backslash, newline, tab, other control char",
+    "event": {
+      "v": 1,
+      "kind": "share",
+      "pubkey": "79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664",
+      "created_at": 1755900000,
+      "identity_mode": "persistent",
+      "nonce": 0,
+      "attestations": [],
+      "page_id": "326a645050274b9b922a7eb20fdf980542877aedb1858f5f84d4e8d8574c6710",
+      "page_url": "https://x.com/",
+      "content": {
+        "text": "a\"b\\c\nd\te\u0001f"
+      }
+    },
+    "canonical": "{\"attestations\":[],\"content\":{\"text\":\"a\\\"b\\\\c\\nd\\te\\u0001f\"},\"created_at\":1755900000,\"identity_mode\":\"persistent\",\"kind\":\"share\",\"nonce\":0,\"page_id\":\"326a645050274b9b922a7eb20fdf980542877aedb1858f5f84d4e8d8574c6710\",\"page_url\":\"https://x.com/\",\"pubkey\":\"79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664\",\"v\":1}",
+    "id": "cbad6c60c3dbe1a51d0a10837c5dee8af46b35a8361ada7827b13ecfbb2db152",
+    "sig": "3366c5878a6fa77ff8a59b17731d23016eea56e68881024c09688e7111d7661136ab17012733eec7f89a166699f7cb444721fb49bd0ec790b37d8eb232283207"
+  },
+  {
+    "name": "vote — smallest envelope, negative integer value",
+    "event": {
+      "v": 1,
+      "kind": "vote",
+      "pubkey": "79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664",
+      "created_at": 1755900123,
+      "identity_mode": "persistent",
+      "nonce": 7,
+      "attestations": [],
+      "target_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "content": {
+        "value": -1
+      }
+    },
+    "canonical": "{\"attestations\":[],\"content\":{\"value\":-1},\"created_at\":1755900123,\"identity_mode\":\"persistent\",\"kind\":\"vote\",\"nonce\":7,\"pubkey\":\"79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664\",\"target_id\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"v\":1}",
+    "id": "c04491cea334120b211dab34cc787f226cfef26b9d691476c14c245c7c567542",
+    "sig": "9b3b914da9184bcc8bc478932c70c7b17b5590a3182f9123186d320717d589211d087f45f4fea13714c4b3c421d9b48d2f9e0b375488a8beb48592346e5ef30f"
+  },
+  {
+    "name": "reply — carries the thread and the denormalized target",
+    "event": {
+      "v": 1,
+      "kind": "reply",
+      "pubkey": "79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664",
+      "created_at": 1755900200,
+      "identity_mode": "ephemeral",
+      "nonce": 3,
+      "attestations": [],
+      "page_id": "b09994f452ef118b0daac68877bc12db6fed896705c139df5d718c02f6c36138",
+      "page_url": "https://x.com/u/status/123",
+      "parent_id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "root_id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "content": {
+        "text": "cevap"
+      }
+    },
+    "canonical": "{\"attestations\":[],\"content\":{\"text\":\"cevap\"},\"created_at\":1755900200,\"identity_mode\":\"ephemeral\",\"kind\":\"reply\",\"nonce\":3,\"page_id\":\"b09994f452ef118b0daac68877bc12db6fed896705c139df5d718c02f6c36138\",\"page_url\":\"https://x.com/u/status/123\",\"parent_id\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"pubkey\":\"79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664\",\"root_id\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"v\":1}",
+    "id": "05f2fbe4b523bd67426368061c61d9c0a31d0478aeda396efb4c61b79dbf286e",
+    "sig": "ee19086fcd7664d434cc75a794f13ede56940ea9673c8d104957d32abd4477c6ae95304dc0da1b518e0243299e83411e8f783903d698c135029f939caddcbc02"
+  }
+]

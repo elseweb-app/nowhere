@@ -1,0 +1,68 @@
+{
+  "trusted_issuers": [
+    "e7f162a10bec559afea195e4dce84b69568d5d2cb0963eb446c0685e2b17f2f0"
+  ],
+  "cases": [
+    {
+      "name": "valid membership from a trusted issuer",
+      "now": 1755900000,
+      "attestation": {
+        "type": "issuer-signed",
+        "issuer": "e7f162a10bec559afea195e4dce84b69568d5d2cb0963eb446c0685e2b17f2f0",
+        "claim": "membership",
+        "subject": "79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664",
+        "issued_at": 1755000000,
+        "expires_at": 1758000000,
+        "sig": "e89975fbecf53f72825567931126d8f4797279deb5775a6be84f140007b6fd61cfc5ce65d75c6504546502e2699eb609cbca1748dad33c1ac516a76c16f8100a"
+      },
+      "canonical": "{\"claim\":\"membership\",\"expires_at\":1758000000,\"issued_at\":1755000000,\"issuer\":\"e7f162a10bec559afea195e4dce84b69568d5d2cb0963eb446c0685e2b17f2f0\",\"subject\":\"79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664\",\"type\":\"issuer-signed\"}",
+      "expect": "valid"
+    },
+    {
+      "name": "expired — signature is fine, the clock is not",
+      "now": 1755900000,
+      "attestation": {
+        "type": "issuer-signed",
+        "issuer": "e7f162a10bec559afea195e4dce84b69568d5d2cb0963eb446c0685e2b17f2f0",
+        "claim": "membership",
+        "subject": "79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664",
+        "issued_at": 1750000000,
+        "expires_at": 1755000000,
+        "sig": "b602639f3a3068b46c502ea59c0e9b5dd16b46097d945d8a4e159caeb1a0a467d09abe0b956c57dfc9c13f309dd9e2827390747431a43885819f128c48a6a00e"
+      },
+      "canonical": "{\"claim\":\"membership\",\"expires_at\":1755000000,\"issued_at\":1750000000,\"issuer\":\"e7f162a10bec559afea195e4dce84b69568d5d2cb0963eb446c0685e2b17f2f0\",\"subject\":\"79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664\",\"type\":\"issuer-signed\"}",
+      "expect": "expired"
+    },
+    {
+      "name": "signed by someone other than the named issuer",
+      "now": 1755900000,
+      "attestation": {
+        "type": "issuer-signed",
+        "issuer": "e7f162a10bec559afea195e4dce84b69568d5d2cb0963eb446c0685e2b17f2f0",
+        "claim": "membership",
+        "subject": "79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664",
+        "issued_at": 1755000000,
+        "expires_at": 1758000000,
+        "sig": "4b08e304ab51c94ae9decf901f4af084b6819458945988bbd276c3150957e6b75aeef6c7c68b8d448378eca4d07ba0bdff3155aed997e2dfed0cda3c69e70c0e"
+      },
+      "canonical": "{\"claim\":\"membership\",\"expires_at\":1758000000,\"issued_at\":1755000000,\"issuer\":\"e7f162a10bec559afea195e4dce84b69568d5d2cb0963eb446c0685e2b17f2f0\",\"subject\":\"79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664\",\"type\":\"issuer-signed\"}",
+      "expect": "signature_invalid"
+    },
+    {
+      "name": "cryptographically valid but the issuer is not trusted here",
+      "now": 1755900000,
+      "trusted_issuers": [],
+      "attestation": {
+        "type": "issuer-signed",
+        "issuer": "e7f162a10bec559afea195e4dce84b69568d5d2cb0963eb446c0685e2b17f2f0",
+        "claim": "membership",
+        "subject": "79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664",
+        "issued_at": 1755000000,
+        "expires_at": 1758000000,
+        "sig": "e89975fbecf53f72825567931126d8f4797279deb5775a6be84f140007b6fd61cfc5ce65d75c6504546502e2699eb609cbca1748dad33c1ac516a76c16f8100a"
+      },
+      "canonical": "{\"claim\":\"membership\",\"expires_at\":1758000000,\"issued_at\":1755000000,\"issuer\":\"e7f162a10bec559afea195e4dce84b69568d5d2cb0963eb446c0685e2b17f2f0\",\"subject\":\"79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664\",\"type\":\"issuer-signed\"}",
+      "expect": "untrusted_issuer"
+    }
+  ]
+}

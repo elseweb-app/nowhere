@@ -1,0 +1,97 @@
+{
+  "mined": [
+    {
+      "required_difficulty": 8,
+      "event": {
+        "v": 1,
+        "kind": "share",
+        "pubkey": "79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664",
+        "created_at": 1755900000,
+        "identity_mode": "persistent",
+        "attestations": [],
+        "page_id": "326a645050274b9b922a7eb20fdf980542877aedb1858f5f84d4e8d8574c6710",
+        "page_url": "https://x.com/",
+        "content": {
+          "text": "pow"
+        },
+        "nonce": 194
+      },
+      "nonce": 194,
+      "canonical": "{\"attestations\":[],\"content\":{\"text\":\"pow\"},\"created_at\":1755900000,\"identity_mode\":\"persistent\",\"kind\":\"share\",\"nonce\":194,\"page_id\":\"326a645050274b9b922a7eb20fdf980542877aedb1858f5f84d4e8d8574c6710\",\"page_url\":\"https://x.com/\",\"pubkey\":\"79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664\",\"v\":1}",
+      "id": "00267ea1caa184997f709812dd955a0d561d2e601fbe2c23e8d9b059890835ab",
+      "actual_difficulty": 10
+    },
+    {
+      "required_difficulty": 12,
+      "event": {
+        "v": 1,
+        "kind": "share",
+        "pubkey": "79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664",
+        "created_at": 1755900000,
+        "identity_mode": "persistent",
+        "attestations": [],
+        "page_id": "326a645050274b9b922a7eb20fdf980542877aedb1858f5f84d4e8d8574c6710",
+        "page_url": "https://x.com/",
+        "content": {
+          "text": "pow"
+        },
+        "nonce": 16440
+      },
+      "nonce": 16440,
+      "canonical": "{\"attestations\":[],\"content\":{\"text\":\"pow\"},\"created_at\":1755900000,\"identity_mode\":\"persistent\",\"kind\":\"share\",\"nonce\":16440,\"page_id\":\"326a645050274b9b922a7eb20fdf980542877aedb1858f5f84d4e8d8574c6710\",\"page_url\":\"https://x.com/\",\"pubkey\":\"79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664\",\"v\":1}",
+      "id": "000e5bc661ccdeac68acf0cc6c8daadbdb7645ef054af402ae1954de6333caf8",
+      "actual_difficulty": 12
+    },
+    {
+      "required_difficulty": 16,
+      "event": {
+        "v": 1,
+        "kind": "share",
+        "pubkey": "79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664",
+        "created_at": 1755900000,
+        "identity_mode": "persistent",
+        "attestations": [],
+        "page_id": "326a645050274b9b922a7eb20fdf980542877aedb1858f5f84d4e8d8574c6710",
+        "page_url": "https://x.com/",
+        "content": {
+          "text": "pow"
+        },
+        "nonce": 196895
+      },
+      "nonce": 196895,
+      "canonical": "{\"attestations\":[],\"content\":{\"text\":\"pow\"},\"created_at\":1755900000,\"identity_mode\":\"persistent\",\"kind\":\"share\",\"nonce\":196895,\"page_id\":\"326a645050274b9b922a7eb20fdf980542877aedb1858f5f84d4e8d8574c6710\",\"page_url\":\"https://x.com/\",\"pubkey\":\"79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664\",\"v\":1}",
+      "id": "0000fb13f49d56690c905d0cf6d5fd7cb640dcb2395b7f006219916ee11c65c6",
+      "actual_difficulty": 16
+    }
+  ],
+  "leading_zero_bits": [
+    {
+      "digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "bits": 256
+    },
+    {
+      "digest": "8000000000000000000000000000000000000000000000000000000000000000",
+      "bits": 0
+    },
+    {
+      "digest": "4000000000000000000000000000000000000000000000000000000000000000",
+      "bits": 1
+    },
+    {
+      "digest": "0100000000000000000000000000000000000000000000000000000000000000",
+      "bits": 7
+    },
+    {
+      "digest": "00ff000000000000000000000000000000000000000000000000000000000000",
+      "bits": 8
+    },
+    {
+      "digest": "0001000000000000000000000000000000000000000000000000000000000000",
+      "bits": 15
+    },
+    {
+      "digest": "ff00000000000000000000000000000000000000000000000000000000000000",
+      "bits": 0
+    }
+  ]
+}

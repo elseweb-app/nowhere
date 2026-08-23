@@ -1,0 +1,8 @@
+node_modules/
+dist/
+build/
+.wxt/
+.env
+.env.*
+coverage/
+.DS_Store

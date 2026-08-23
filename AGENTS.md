@@ -70,8 +70,6 @@ why `apps/web` must stay statically buildable.
 
 ```
 pnpm install                      # install all workspaces
-pnpm --filter extension dev       # run the extension in dev mode (loads in Chrome)
-pnpm --filter web dev             # run the everywhere.app site locally
 pnpm build                        # build every workspace
 pnpm lint                         # eslint + prettier check across the repo
 pnpm test                         # vitest across the repo
@@ -80,6 +78,10 @@ pnpm format                       # write prettier formatting
 
 Package manager is **pnpm** with workspaces. There is no Turborepo; root scripts fan out
 with `pnpm -r`.
+
+Not built yet, so the commands do not exist either: `pnpm --filter extension dev` and
+`pnpm --filter web dev`. Add them to this list in the PR that makes them real, not before —
+a command listed here is a promise that it runs.
 
 ## 5. Language rules
 

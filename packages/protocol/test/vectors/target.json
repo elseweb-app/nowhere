@@ -1,0 +1,233 @@
+{
+  "note": "page_id is hex(SHA-256(utf8(normalized_url))). The anchor is NOT part of page_id; the join key is the pair (page_id, anchor.id).",
+  "normalize": [
+    {
+      "name": "already canonical",
+      "input": "https://x.com/",
+      "normalized": "https://x.com/",
+      "page_id": "326a645050274b9b922a7eb20fdf980542877aedb1858f5f84d4e8d8574c6710"
+    },
+    {
+      "name": "scheme and host lowercased, path case preserved",
+      "input": "HTTPS://X.CoM/Foo",
+      "normalized": "https://x.com/Foo",
+      "page_id": "36202842d8c6bb79324a1bf0e7c47ae1ad468cf76d860dcc2a188c1f4259bcf7"
+    },
+    {
+      "name": "empty path becomes /",
+      "input": "https://x.com",
+      "normalized": "https://x.com/",
+      "page_id": "326a645050274b9b922a7eb20fdf980542877aedb1858f5f84d4e8d8574c6710"
+    },
+    {
+      "name": "default port removed",
+      "input": "https://x.com:443/foo",
+      "normalized": "https://x.com/foo",
+      "page_id": "80c42232d0107286cc6aec3260844deaed36245ea56c58e25ce47ecc21c8b13a"
+    },
+    {
+      "name": "non-default port kept",
+      "input": "https://x.com:8443/foo",
+      "normalized": "https://x.com:8443/foo",
+      "page_id": "a9726341c4c70bd48cff92dbbdf27ed97edf389d552ab1efd1a37d3433d875ee"
+    },
+    {
+      "name": "fragment dropped",
+      "input": "https://x.com/foo#bar",
+      "normalized": "https://x.com/foo",
+      "page_id": "80c42232d0107286cc6aec3260844deaed36245ea56c58e25ce47ecc21c8b13a"
+    },
+    {
+      "name": "empty fragment dropped",
+      "input": "https://x.com/foo#",
+      "normalized": "https://x.com/foo",
+      "page_id": "80c42232d0107286cc6aec3260844deaed36245ea56c58e25ce47ecc21c8b13a"
+    },
+    {
+      "name": "userinfo removed",
+      "input": "https://u:p@x.com/foo",
+      "normalized": "https://x.com/foo",
+      "page_id": "80c42232d0107286cc6aec3260844deaed36245ea56c58e25ce47ecc21c8b13a"
+    },
+    {
+      "name": "trailing dot on host removed",
+      "input": "https://x.com./foo",
+      "normalized": "https://x.com/foo",
+      "page_id": "80c42232d0107286cc6aec3260844deaed36245ea56c58e25ce47ecc21c8b13a"
+    },
+    {
+      "name": "dot segments resolved",
+      "input": "https://x.com/a/b/../c",
+      "normalized": "https://x.com/a/c",
+      "page_id": "48197f35900e98de3dc22d171bcd61589235779cdb8c6295985849553699357f"
+    },
+    {
+      "name": "percent-encoded unreserved character decoded",
+      "input": "https://x.com/%7Euser",
+      "normalized": "https://x.com/~user",
+      "page_id": "3268443f3c256e6d31d4b8cb3b9b1912c397869539392168a57a3e5c529e86d5"
+    },
+    {
+      "name": "percent-encoded reserved character preserved, hex uppercased",
+      "input": "https://x.com/a%2fb",
+      "normalized": "https://x.com/a%2Fb",
+      "page_id": "200d55d41acdb679bac626905d6bdf78941871097aaa1de832b8a560d3dfd847"
+    },
+    {
+      "name": "trailing slash is significant and preserved",
+      "input": "https://x.com/foo/",
+      "normalized": "https://x.com/foo/",
+      "page_id": "8115c561f51c5194a9f8ff7a9cafc23de11c182b3df4f02aa02a19d985cd3085"
+    },
+    {
+      "name": "tracking parameters stripped",
+      "input": "https://x.com/foo?utm_source=a&utm_medium=b&fbclid=c&gclid=d",
+      "normalized": "https://x.com/foo",
+      "page_id": "80c42232d0107286cc6aec3260844deaed36245ea56c58e25ce47ecc21c8b13a"
+    },
+    {
+      "name": "remaining query parameters sorted by name",
+      "input": "https://x.com/foo?b=2&a=1",
+      "normalized": "https://x.com/foo?a=1&b=2",
+      "page_id": "9c574451167309efaa79e8943eeb1898494eea6b9ad4d5d01bad7b76854812ba"
+    },
+    {
+      "name": "repeated keys sorted by name then value",
+      "input": "https://x.com/foo?b=2&a=2&a=1",
+      "normalized": "https://x.com/foo?a=1&a=2&b=2",
+      "page_id": "9513b49d84788c2348a63e5784636264bf2bb660baad4ab498a50b2461e80c27"
+    },
+    {
+      "name": "tracking params stripped, real ones kept and sorted",
+      "input": "https://x.com/foo?z=1&utm_campaign=x&a=2",
+      "normalized": "https://x.com/foo?a=2&z=1",
+      "page_id": "0abfad4f465999d7d9ae71551bda1384ffeeea5cfcffe2909d0b3d4a2d54cf15"
+    },
+    {
+      "name": "query that is empty after stripping loses the question mark",
+      "input": "https://x.com/foo?utm_source=a",
+      "normalized": "https://x.com/foo",
+      "page_id": "80c42232d0107286cc6aec3260844deaed36245ea56c58e25ce47ecc21c8b13a"
+    },
+    {
+      "name": "a valueless parameter becomes name=",
+      "input": "https://x.com/foo?a",
+      "normalized": "https://x.com/foo?a=",
+      "page_id": "836c0c346d74d44ea7b5a8209f6308d42a7cf88ddda9cab64aa054b6df688d26"
+    },
+    {
+      "name": "query sort compares UTF-16 code units, not locale order",
+      "input": "https://x.com/foo?a=2&B=1",
+      "normalized": "https://x.com/foo?B=1&a=2",
+      "page_id": "5f9c68f038a9c27ef5df9e274c52c1177822addf9bfd47b14c75e267fffcbff0"
+    },
+    {
+      "name": "internationalized host becomes its punycode form",
+      "input": "https://türkiye.com/",
+      "normalized": "https://xn--trkiye-3ya.com/",
+      "page_id": "dd503ed3b1277f1286523f8bb47960043706479af8377b1ad202f317114bd2e8"
+    },
+    {
+      "name": "http default port removed too",
+      "input": "http://x.com:80/foo",
+      "normalized": "http://x.com/foo",
+      "page_id": "19f9a005c0c0d5f8640b9c03157ee0c072dbd36a74b3b01f5701000cf139f5a7"
+    },
+    {
+      "name": "a real status URL is a level 1 target and is left alone",
+      "input": "https://x.com/someone/status/1234567890",
+      "normalized": "https://x.com/someone/status/1234567890",
+      "page_id": "7f539b5fcdbb7e35bd367dc7e32b53099d00b2e04e29a80862610222b9e00f1e"
+    }
+  ],
+  "rejected": [
+    {
+      "name": "unsupported scheme",
+      "input": "ftp://x.com/foo"
+    },
+    {
+      "name": "javascript scheme",
+      "input": "javascript:alert(1)"
+    },
+    {
+      "name": "data scheme",
+      "input": "data:text/plain,hi"
+    },
+    {
+      "name": "about:blank",
+      "input": "about:blank"
+    },
+    {
+      "name": "not a URL",
+      "input": "not a url"
+    },
+    {
+      "name": "empty string",
+      "input": ""
+    }
+  ],
+  "distinct": [
+    {
+      "name": "http and https are different targets",
+      "a": "http://x.com/",
+      "b": "https://x.com/",
+      "page_id_a": "138a7318946e529d58f91a7f469ceaf8adecfc74bece46302345a126506dbe37",
+      "page_id_b": "326a645050274b9b922a7eb20fdf980542877aedb1858f5f84d4e8d8574c6710"
+    },
+    {
+      "name": "trailing slash makes a different target",
+      "a": "https://x.com/foo",
+      "b": "https://x.com/foo/",
+      "page_id_a": "80c42232d0107286cc6aec3260844deaed36245ea56c58e25ce47ecc21c8b13a",
+      "page_id_b": "8115c561f51c5194a9f8ff7a9cafc23de11c182b3df4f02aa02a19d985cd3085"
+    },
+    {
+      "name": "path case makes a different target",
+      "a": "https://x.com/Foo",
+      "b": "https://x.com/foo",
+      "page_id_a": "36202842d8c6bb79324a1bf0e7c47ae1ad468cf76d860dcc2a188c1f4259bcf7",
+      "page_id_b": "80c42232d0107286cc6aec3260844deaed36245ea56c58e25ce47ecc21c8b13a"
+    }
+  ],
+  "levels": [
+    {
+      "level": 0,
+      "note": "The site main feed. The adapter supplies the site root; nothing generic could know this.",
+      "adapter_canonical_url": "https://x.com/",
+      "anchor": null,
+      "page_id": "326a645050274b9b922a7eb20fdf980542877aedb1858f5f84d4e8d8574c6710"
+    },
+    {
+      "level": 1,
+      "note": "A content page reachable by URL.",
+      "adapter_canonical_url": "https://x.com/someone/status/1234567890",
+      "anchor": null,
+      "page_id": "7f539b5fcdbb7e35bd367dc7e32b53099d00b2e04e29a80862610222b9e00f1e"
+    },
+    {
+      "level": 2,
+      "note": "Sub-content inside that page. page_id is unchanged; the anchor is what narrows it.",
+      "adapter_canonical_url": "https://x.com/someone/status/1234567890",
+      "anchor": {
+        "id": "1234567891"
+      },
+      "page_id": "7f539b5fcdbb7e35bd367dc7e32b53099d00b2e04e29a80862610222b9e00f1e"
+    }
+  ],
+  "tracking_parameters": [
+    "utm_* (any parameter whose name starts with utm_)",
+    "fbclid",
+    "gclid",
+    "gbraid",
+    "wbraid",
+    "msclkid",
+    "dclid",
+    "yclid",
+    "mc_cid",
+    "mc_eid",
+    "igshid",
+    "ref_src",
+    "ref_url",
+    "_ga"
+  ]
+}

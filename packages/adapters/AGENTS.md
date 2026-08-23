@@ -13,7 +13,23 @@ at:
 - Does this adapter apply to the current page?
 - Where is the host's composer, and what element do we anchor our control to?
 - Where should the overlay of shared content be placed?
-- What context describes the current page (used to derive page identity)?
+- **What is the canonical target URL for this page?**
+- **What is the anchor id for a given piece of sub-content on it, if any?**
+
+The last two are the adapter's most consequential answers, and they are the reason
+adapters exist at all rather than being a convenience. See §6 of
+`packages/protocol/SPEC.md`.
+
+`packages/protocol` normalizes URLs generically — case, port, fragment, tracking
+parameters. What it cannot know is that `x.com/home` and `x.com/explore` are both the
+site's main feed and collapse to `https://x.com/`, while `x.com/user/status/123` does not.
+That is site knowledge, so the adapter names the canonical URL and protocol hashes it.
+
+**Anchor ids come from what the site itself exposes** — the id inside a permalink, a post
+id, a comment id. Never from DOM position, element index, ordering, or a generated class
+name. A DOM-derived anchor is not stable across re-renders and is not stable between two
+users, and when it drifts the two of them silently stop seeing each other. This is the one
+place in this package where a wrong answer is invisible rather than obviously broken.
 
 That is the whole surface. Keep the interface identical across adapters — the extension
 must never branch on which adapter it got.
