@@ -76,11 +76,14 @@ export const EventSchema = v.variant('kind', [ShareSchema, ReplySchema, VoteSche
 
 // Deliberately not strict. A relay may advertise capabilities this client has never heard
 // of, and refusing to read its policy over an unknown field would be the client's bug.
-export const PolicySchema = v.object({
+// `looseObject` rather than `object` because valibot's `object` strips what it does not
+// recognize: a v2 field would survive validation and then quietly vanish before any
+// caller could see it, which is a worse failure than rejecting it outright.
+export const PolicySchema = v.looseObject({
   protocol_versions: v.array(integer()),
   kinds: v.array(v.string()),
   pow: v.optional(
-    v.object({
+    v.looseObject({
       default_difficulty: v.optional(v.record(v.string(), integer())),
       max_difficulty: v.optional(integer()),
       challenge_required: v.optional(v.boolean()),
@@ -89,13 +92,23 @@ export const PolicySchema = v.object({
   freshness_window_seconds: v.optional(integer()),
   max_payload_bytes: v.optional(integer()),
   attestations: v.optional(
-    v.object({
+    v.looseObject({
       required_for: v.optional(v.array(v.string())),
       trusted_issuers: v.optional(v.array(hex64())),
       feed_requires: v.optional(v.array(v.string())),
     })
   ),
   quotas: v.optional(v.record(v.string(), v.union([integer(), v.record(v.string(), integer())]))),
+})
+
+// GET /keys/{pubkey} (SPEC.md §7.3, §10): what one specific key currently must pay and
+// how much quota it has left. `looseObject` throughout, same reasoning as PolicySchema —
+// a relay may report a field this client has never heard of, and valibot's `object`
+// would silently strip it rather than reject it, deleting a forward-compatible field
+// before any caller could see it. Every field is optional: a relay may omit either.
+export const KeyStatusSchema = v.looseObject({
+  required_difficulty: v.optional(v.record(v.string(), integer())),
+  remaining_quota: v.optional(v.record(v.string(), integer())),
 })
 
 const rejectionCodes = [
@@ -111,9 +124,12 @@ const rejectionCodes = [
   'QUOTA_EXCEEDED',
 ]
 
-// Each code carries its own extra fields, so this stays open past code and message.
-export const ErrorEnvelopeSchema = v.object({
-  error: v.object({
+// Each code carries its own extra fields (SPEC.md section 16), so this stays open past
+// code and message. It must be `looseObject`, not `object`: valibot's `object` does not
+// reject an unknown key, it *strips* it, which would silently delete the
+// `required_difficulty` a client needs in order to re-mine.
+export const ErrorEnvelopeSchema = v.looseObject({
+  error: v.looseObject({
     code: v.picklist(rejectionCodes),
     message: v.string(),
   }),
@@ -126,3 +142,4 @@ export const safeParseEvent = (value) => v.safeParse(EventSchema, value)
 export const safeParsePolicy = (value) => v.safeParse(PolicySchema, value)
 export const safeParseErrorEnvelope = (value) => v.safeParse(ErrorEnvelopeSchema, value)
 export const safeParseAttestation = (value) => v.safeParse(AttestationSchema, value)
+export const safeParseKeyStatus = (value) => v.safeParse(KeyStatusSchema, value)
