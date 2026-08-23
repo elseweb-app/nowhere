@@ -145,7 +145,7 @@ which app is hosting it — the platform's storage and its UI are injected as po
 ## 9. Git and pull requests
 
 - One PR, one concern.
-- Commit messages are written in Turkish, with a light touch. Humour is welcome;
+- Commit messages are written in English, with a light touch. Humour is welcome;
   being uninformative is not — the subject line still has to say what actually
   changed. Keep the subject short, put the detail in the body.
 - **A PR that changes behavior updates the relevant `AGENTS.md` in the same PR.**
