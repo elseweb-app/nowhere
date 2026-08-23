@@ -108,4 +108,14 @@ const app = createRelayApp({
   clock: { now: () => Math.floor(Date.now() / 1000) },
 })
 
-Deno.serve((request) => app.handle(request))
+function normalizeFunctionRequest(request) {
+  const url = new URL(request.url)
+
+  if (url.pathname === '/relay' || url.pathname.startsWith('/relay/')) {
+    url.pathname = url.pathname.slice('/relay'.length) || '/'
+  }
+
+  return new Request(url, request)
+}
+
+Deno.serve((request) => app.handle(normalizeFunctionRequest(request)))
