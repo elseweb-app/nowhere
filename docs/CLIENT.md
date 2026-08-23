@@ -564,6 +564,18 @@ client.relays.remove('https://relay.example.com')
 client.relays.list() // [{ url, readable, writable }, ...]
 ```
 
+**If you are running in a browser, the relay has to send CORS headers.** Your page
+fetching a relay on another origin is a cross-origin request, and without
+`Access-Control-Allow-Origin` the browser will refuse to hand you the response even
+though the relay answered correctly — which surfaces as an opaque network failure rather
+than a protocol rejection, so it is worth recognizing. The reference relay's Supabase
+binding sets those headers and answers `OPTIONS` preflight; a relay you host yourself has
+to do the same. See "CORS" in [`RUNNING_A_RELAY.md`](RUNNING_A_RELAY.md).
+
+Note that this is a browser transport concern and not part of the protocol: nothing in
+`SPEC.md` requires it, and a relay consumed only from a server or an extension background
+worker never needs it.
+
 Changing the set never touches identity — the keypair is the identity; a relay is only
 somewhere events are kept (SPEC.md §12).
 

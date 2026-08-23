@@ -283,6 +283,53 @@ file, that is a sign it is in the wrong place — per `relay/supabase/README.md`
 contract lives in `relay/src`, and a rule enforced only in the edge function would be
 a rule no other binding of this relay obeys.
 
+### The URL your relay actually has
+
+Supabase serves an edge function at:
+
+```
+https://<project-ref>.supabase.co/functions/v1/relay
+```
+
+That is the base URL you give clients, and it is what goes in a client's `relays` array.
+Supabase strips `/functions/v1` before the function sees the request, so the function
+receives `/relay/policy` rather than `/policy`. `normalizeFunctionRequest()` in
+`functions/relay/index.js` strips that remaining `/relay` prefix before routing, which is
+why the same `relay/src` router works unchanged here and behind the plain `node:http`
+server in section 3.
+
+Verify a deployed relay the same way as a local one:
+
+```
+curl -s https://<project-ref>.supabase.co/functions/v1/relay/policy
+```
+
+### CORS
+
+The function answers `OPTIONS` preflight with `204` and sets these on every response:
+
+```
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, POST, OPTIONS
+Access-Control-Allow-Headers: content-type
+```
+
+Browser consumers need this. A page on `elseweb.lol` — or any other site — fetching your
+relay from JavaScript is a cross-origin request, and without these headers the browser
+refuses to hand the response to the page even though the relay answered correctly.
+
+`*` is deliberate rather than careless: a relay's read endpoints are public by design, and
+an allowlist of origins would make the relay pick which clients may exist, which is exactly
+the privilege the protocol avoids. It is worth understanding what it does and does not do.
+It does not authenticate anything, and it is not an access control: every request still
+goes through the full verification pipeline. What it does mean is that any web page can
+issue reads against your relay, so your quotas, payload caps and PoW settings — not CORS —
+are what bound the load you are willing to carry.
+
+Note also that CORS lives in the Supabase binding, not in `relay/src`. It is a browser
+transport concern, not a protocol rule, so another binding is free to handle it
+differently.
+
 ## 7. Relay policy
 
 Every threshold is configuration, injected as the `config` object documented in the
