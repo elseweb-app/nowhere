@@ -44,6 +44,32 @@ each out independently and return what arrived.
 tightest so one event satisfies all of them. Surface `ATTESTATION_REQUIRED` to the user
 rather than retrying.
 
+**A relay's own policy can take it out of scope before mining ever starts.** A relay
+whose policy cannot be fetched, that does not list the event's `kind`, or that does not
+list the event's protocol version is excluded from that publish and reported back as
+`RELAY_UNREACHABLE`, `UNSUPPORTED_KIND` or `UNSUPPORTED_VERSION` — never allowed to abort
+the broadcast to the relays that are fine. Difficulty is clamped to whatever
+`pow.max_difficulty` a relay advertises, and payload size is checked against the tightest
+`max_payload_bytes` before mining, not after.
+
+**Freshness can expire during mining.** `created_at` is fixed before mining starts, and a
+long search at high difficulty can push it outside every relay's freshness window before
+the event is ever submitted. `publishToRelays()` (`src/publish.js`) checks this once,
+against the tightest advertised window, and rebuilds with a fresh `created_at` and
+re-mines exactly once if needed — never a retry loop.
+
+## Attestation trust
+
+`src/attestations.js` wraps protocol's `verifyAttestation()` with a client's own
+trusted-issuer list (SPEC.md section 8.1): an absent or empty list trusts nobody, and the
+five check-order failure reasons stay distinguishable rather than collapsing to one
+boolean. `src/standing.js` folds that into `standingByPubkey` for `tallyVotes()`, using
+trusted unexpired attestations and `identity_mode` — key tier and account age are not
+knowable from events alone (that needs a `GET /keys/{pubkey}` per author) and are
+deliberately left out rather than faked. `rankEvents()` takes a precomputed
+`trustedAttestationCountByEventId` for the same reason: verification is async WebCrypto
+work, and ranking itself stays a synchronous sort.
+
 ## Keys
 
 - Generate Ed25519 keys as **extractable**. A user must be able to move their identity to

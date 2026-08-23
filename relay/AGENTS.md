@@ -18,6 +18,25 @@ That has one consequence that governs everything here:
 If a change would make the contract harder for a non-Supabase relay to implement, it is
 the wrong change.
 
+## Layout
+
+The relay is a portable core plus thin bindings, so that "Supabase is an implementation
+detail" is a structural fact rather than an intention:
+
+| Path | Role |
+|---|---|
+| `src/` | The whole relay: verification, policy, quotas, feed, routing. Plain JS, Web-standard `Request`/`Response`, no Supabase, no framework |
+| `src/store.js` | The storage port. Injected, never constructed inside the core |
+| `supabase/` | The deployment binding: Deno edge function, the port over Postgres, migrations |
+| `test/` | An in-memory store and a `node:http` server, so the end-to-end test runs in vitest with no Docker and no Supabase account |
+
+The core must never import anything from `supabase/`. If it needs to, the port is missing
+a method — add it to the port, not a special case to the core.
+
+`test/e2e.test.js` depends on `packages/client`, which is why `@elseweb/client` is a
+**devDependency** here. That is test-only and does not reverse the dependency direction in
+root `AGENTS.md` section 7: nothing in `src/` may import a client.
+
 ## The contract
 
 The endpoints, payloads, verification order, policy document and rejection codes are

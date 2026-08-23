@@ -59,12 +59,21 @@ writing code.
 | `packages/protocol` | `SPEC.md` and its implementation: event schemas, canonical serialization, crypto, proof-of-work, page identity | Browser APIs, network calls, storage |
 | `packages/client` | Relay pool, publishing, reading and merging, key management, ranking — everything a client does that is not UI | DOM, platform storage APIs, site selectors |
 | `packages/adapters` | Per-site adapters (x.com + generic fallback) | Network calls, storage, extension internals |
-| `relay/` | Reference relay: edge function, migrations, RLS policies, membership issuer | Client code |
+| `relay/` | Reference relay: a portable core in `src/`, a Supabase binding in `supabase/`, migrations and RLS policies | Client code, anything Supabase-specific inside `src/` |
 
 A mobile app arrives in a later phase as a Capacitor wrapper around `apps/web`. It is not
 a fourth implementation: it consumes `packages/client` exactly as the other two do. This
 is the reason client logic lives in a package rather than in `apps/extension`, and it is
 why `apps/web` must stay statically buildable.
+
+`relay/` is a workspace member so its tests run with everyone else's. The dependency
+direction is unchanged: nothing in `relay/src` may import a client, and `@elseweb/client`
+appears there only as a **devDependency**, for the end-to-end test that drives a real relay
+over HTTP.
+
+**The client is the first finished vertical, not the extension.** `packages/client` is
+usable today by any browser application — see `packages/client/README.md`. The extension
+becomes another host of it rather than the place any of it lives.
 
 ## 4. Setup and commands
 
@@ -78,6 +87,11 @@ pnpm format                       # write prettier formatting
 
 Package manager is **pnpm** with workspaces. There is no Turborepo; root scripts fan out
 with `pnpm -r`.
+
+`pnpm test` covers `packages/*/test` and `relay/test`. The end-to-end proof is
+`relay/test/e2e.test.js`: it starts a real HTTP relay on an ephemeral port and drives it
+through the public `@elseweb/client` API only — no Docker, no Supabase account, no
+extension.
 
 Not built yet, so the commands do not exist either: `pnpm --filter extension dev` and
 `pnpm --filter web dev`. Add them to this list in the PR that makes them real, not before —

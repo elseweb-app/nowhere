@@ -36,9 +36,11 @@ export {
   AttestationSchema,
   PolicySchema,
   ErrorEnvelopeSchema,
+  KeyStatusSchema,
   parseEvent,
   safeParseEvent,
   safeParsePolicy,
   safeParseErrorEnvelope,
   safeParseAttestation,
+  safeParseKeyStatus,
 } from './schemas.js'
