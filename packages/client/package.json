@@ -1,16 +1,21 @@
 {
   "name": "@elseweb/client",
-  "private": true,
+  "version": "0.1.0",
   "type": "module",
-  "version": "0.0.0",
-  "main": "./src/index.js",
+  "files": ["dist"],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "exports": {
-    ".": "./src/index.js"
+    ".": {
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
   },
   "scripts": {
-    "build": "exit 0"
+    "build": "node build.mjs"
   },
-  "dependencies": {
-    "@elseweb/protocol": "workspace:*"
+  "devDependencies": {
+    "@elseweb/protocol": "workspace:*",
+    "esbuild": "^0.21.5"
   }
 }
