@@ -72,6 +72,24 @@ deliberately left out rather than faked. `rankEvents()` takes a precomputed
 `trustedAttestationCountByEventId` for the same reason: verification is async WebCrypto
 work, and ranking itself stays a synchronous sort.
 
+## Compute worker (`worker-identity.js`, `compute.js`, `webrtc.js`)
+
+Root `AGENTS.md`'s compute-bridge direction: a host (the extension, or any other) that
+wants to act as a compute worker composes three modules, same injected-port discipline
+as everywhere else in this package:
+
+- `worker-identity.js` mirrors `keys.js` for a **separate** worker keypair (SPEC.md
+  §18) — the owner's private key is only ever taken as a one-shot parameter to
+  `authorize()`/`revokeCurrentDelegation()`, never stored here.
+- `compute.js` (`createComputeClient`) talks to one relay's `/compute/*` endpoints
+  (relay/AGENTS.md), the same `{ ok, ... }`-typed-outcome/injected-fetch-and-clock shape
+  as `relay.js`. It never carries a job's prompt or result — only admission and routing
+  metadata.
+- `webrtc.js` negotiates the DataChannel a job's prompt/result actually travel over,
+  using `compute.js`'s signal mailbox for SDP/ICE exchange only. `RTCPeerConnection` is
+  an injected constructor, the same discipline `fetch` gets — this package still never
+  reaches for a browser global directly.
+
 ## Keys
 
 - Generate Ed25519 keys as **extractable**. A user must be able to move their identity to

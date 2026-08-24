@@ -102,19 +102,21 @@ pnpm build                        # build every workspace
 pnpm lint                         # eslint + prettier check across the repo
 pnpm test                         # vitest across the repo
 pnpm format                       # write prettier formatting
+pnpm --filter extension dev       # WXT dev build of the extension (loads unpacked)
+pnpm --filter extension build     # production build to apps/extension/.output
 ```
 
 Package manager is **pnpm** with workspaces. There is no Turborepo; root scripts fan out
 with `pnpm -r`.
 
-`pnpm test` covers `packages/*/test` and `relay/test`. The end-to-end proof is
-`relay/test/e2e.test.js`: it starts a real HTTP relay on an ephemeral port and drives it
-through the public `@elseweb-app/client` API only — no Docker, no Supabase account, no
-extension.
-
-Not built yet, so the command does not exist either: `pnpm --filter extension dev`.
-Add it to this list in the PR that makes it real, not before —
-a command listed here is a promise that it runs.
+`pnpm test` covers `packages/*/test`, `relay/test` and `apps/*/test`. The end-to-end
+proof is `relay/test/e2e.test.js`: it starts a real HTTP relay on an ephemeral port and
+drives it through the public `@elseweb-app/client` API only — no Docker, no Supabase
+account, no extension. `apps/extension/test` covers the worker's own logic (admission
+limits, the local-AI provider, the poll-claim-execute tick, WebRTC negotiation) the same
+way — dependency-injected and browser-free; loading the unpacked build in Chrome is still
+the only way to verify the popup/options UI and the manifest itself (see
+`apps/extension/AGENTS.md`).
 
 ## 5. Language rules
 

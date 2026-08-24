@@ -10,9 +10,25 @@ import {
   handleGetVotesByTarget,
   handleGetFeed,
 } from './handlers.js'
+import {
+  handleCreateJob,
+  handleListPendingJobs,
+  handleClaimJob,
+  handleGetJob,
+  handlePostSignal,
+  handleListSignals,
+  handleSubmitReceipt,
+  handleCountersignReceipt,
+  handleSubmitRevocation,
+} from './compute.js'
 import { schemaInvalidError, statusForCode } from './errors.js'
 
 const KEY_STATUS_PATH = /^\/keys\/([^/]+)$/
+const JOB_PATH = /^\/compute\/jobs\/([^/]+)$/
+const JOB_CLAIM_PATH = /^\/compute\/jobs\/([^/]+)\/claim$/
+const JOB_SIGNAL_PATH = /^\/compute\/jobs\/([^/]+)\/signal$/
+const JOB_RECEIPT_PATH = /^\/compute\/jobs\/([^/]+)\/receipt$/
+const JOB_COUNTERSIGN_PATH = /^\/compute\/jobs\/([^/]+)\/countersign$/
 
 function jsonResponse(status, body) {
   return new Response(JSON.stringify(body), {
@@ -74,6 +90,97 @@ export async function routeRequest(request, deps) {
 
   if (request.method === 'GET' && pathname === '/feed') {
     const result = await handleGetFeed({ cursor: searchParams.get('cursor'), ...deps })
+    return jsonResponse(result.status, result.body)
+  }
+
+  // Compute transport (root AGENTS.md's compute-bridge direction): admission/routing
+  // metadata and WebRTC signaling only, never a job's prompt or result. Kept entirely
+  // separate from the /events store above. A binding with no computeStore configured
+  // never routes here at all — same 404 fallback as any other unrouted path.
+  if (pathname.startsWith('/compute/') && !deps.computeStore) {
+    return jsonResponse(404, {
+      error: { code: 'NOT_FOUND', message: `no route for ${request.method} ${pathname}` },
+    })
+  }
+
+  if (request.method === 'POST' && pathname === '/compute/jobs') {
+    const parsedBody = await readJsonBody(request)
+    if (!parsedBody.ok) return jsonResponse(parsedBody.status, parsedBody.body)
+    const result = await handleCreateJob({ body: parsedBody.value, ...deps })
+    return jsonResponse(result.status, result.body)
+  }
+
+  if (request.method === 'GET' && pathname === '/compute/jobs') {
+    const result = await handleListPendingJobs({
+      capability: searchParams.get('capability'),
+      ...deps,
+    })
+    return jsonResponse(result.status, result.body)
+  }
+
+  const jobClaimMatch = pathname.match(JOB_CLAIM_PATH)
+  if (request.method === 'POST' && jobClaimMatch) {
+    const parsedBody = await readJsonBody(request)
+    if (!parsedBody.ok) return jsonResponse(parsedBody.status, parsedBody.body)
+    const result = await handleClaimJob({
+      jobId: jobClaimMatch[1],
+      body: parsedBody.value,
+      ...deps,
+    })
+    return jsonResponse(result.status, result.body)
+  }
+
+  const jobSignalMatch = pathname.match(JOB_SIGNAL_PATH)
+  if (request.method === 'POST' && jobSignalMatch) {
+    const parsedBody = await readJsonBody(request)
+    if (!parsedBody.ok) return jsonResponse(parsedBody.status, parsedBody.body)
+    const result = await handlePostSignal({
+      jobId: jobSignalMatch[1],
+      body: parsedBody.value,
+      ...deps,
+    })
+    return jsonResponse(result.status, result.body)
+  }
+  if (request.method === 'GET' && jobSignalMatch) {
+    const since = searchParams.has('since') ? Number(searchParams.get('since')) : -1
+    const result = await handleListSignals({ jobId: jobSignalMatch[1], since, ...deps })
+    return jsonResponse(result.status, result.body)
+  }
+
+  const jobReceiptMatch = pathname.match(JOB_RECEIPT_PATH)
+  if (request.method === 'POST' && jobReceiptMatch) {
+    const parsedBody = await readJsonBody(request)
+    if (!parsedBody.ok) return jsonResponse(parsedBody.status, parsedBody.body)
+    const result = await handleSubmitReceipt({
+      jobId: jobReceiptMatch[1],
+      body: parsedBody.value,
+      ...deps,
+    })
+    return jsonResponse(result.status, result.body)
+  }
+
+  const jobCountersignMatch = pathname.match(JOB_COUNTERSIGN_PATH)
+  if (request.method === 'POST' && jobCountersignMatch) {
+    const parsedBody = await readJsonBody(request)
+    if (!parsedBody.ok) return jsonResponse(parsedBody.status, parsedBody.body)
+    const result = await handleCountersignReceipt({
+      jobId: jobCountersignMatch[1],
+      body: parsedBody.value,
+      ...deps,
+    })
+    return jsonResponse(result.status, result.body)
+  }
+
+  if (request.method === 'POST' && pathname === '/compute/revocations') {
+    const parsedBody = await readJsonBody(request)
+    if (!parsedBody.ok) return jsonResponse(parsedBody.status, parsedBody.body)
+    const result = await handleSubmitRevocation({ body: parsedBody.value, ...deps })
+    return jsonResponse(result.status, result.body)
+  }
+
+  const jobMatch = pathname.match(JOB_PATH)
+  if (request.method === 'GET' && jobMatch) {
+    const result = await handleGetJob({ jobId: jobMatch[1], ...deps })
     return jsonResponse(result.status, result.body)
   }
 

@@ -59,6 +59,41 @@ Rules:
 - Changing the contract means changing `packages/protocol` and any published standard
   page in the same PR. See the breaking-change rule in `packages/protocol/AGENTS.md`.
 
+## Compute transport (`src/compute.js`, `src/compute-store.js`)
+
+Root `AGENTS.md`'s compute-bridge direction needs a way for a real remote job to reach
+an extension worker and a result to come back. This relay carries the **admission and
+routing metadata only** — never a job's prompt or result, not even transiently:
+
+- `POST /compute/jobs` — a requester announces intent to run a `capability`, admitted by
+  a `work-proof` (SPEC.md §21) mined at `config.compute.jobAdmissionDifficulty`. No
+  prompt in the body.
+- `GET /compute/jobs?capability=` — a worker polls pending jobs offering a capability.
+- `POST /compute/jobs/{id}/claim` — first valid claim wins. The worker presents a
+  `worker-delegation` (SPEC.md §18); the relay checks signature, self-delegation,
+  **revocation only against revocations it has actually stored** via
+  `POST /compute/revocations` — never an assumed or unstated list — expiry and the
+  claimed capability, in that order.
+- `POST /compute/jobs/{id}/signal` and `GET .../signal?since=` — a per-job mailbox for
+  WebRTC SDP/ICE only. `data` is opaque and forwarded verbatim; **the actual prompt and
+  result travel peer-to-peer over the resulting DataChannel, never through this relay**,
+  ephemerally or otherwise. This is the boundary that keeps compute transport separate
+  from the permanent `/events` store.
+- `POST /compute/jobs/{id}/receipt` and `.../countersign` — the worker's, then
+  optionally the requester's, signed `compute-receipt` (SPEC.md §19). Only a receipt
+  that passes `verifyReceipt` moves a job to `done`; a failed job gets no receipt.
+
+`computeStore` (`src/compute-store.js`) is a **separate, optional** injected port from
+`store.js` — a binding that omits it simply 404s every `/compute/*` route, same as any
+unrouted path. The in-memory reference in `test/memory-compute-store.js` is a
+single-process implementation for tests and a bare Node/Deno binding; **the Supabase
+binding does not implement a compute store yet** — do not claim compute-transport
+support for the Supabase deployment until one exists there.
+
+`config.compute` (`jobAdmissionDifficulty`, `jobTtlSeconds`, `freshnessWindowSeconds`,
+`listingLimit`) follows the same rule as every other number here: configuration, never a
+literal in code.
+
 ## Anti-flood: this is where policy lives
 
 Keys are free to create, so identity alone carries no weight. The spec gives us the

@@ -1,0 +1,20 @@
+{
+  "name": "@elseweb/extension",
+  "private": true,
+  "type": "module",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "wxt",
+    "build": "wxt build",
+    "test": "exit 0"
+  },
+  "dependencies": {
+    "@elseweb/protocol": "workspace:*",
+    "@elseweb-app/client": "workspace:*",
+    "svelte": "^5.0.0"
+  },
+  "devDependencies": {
+    "wxt": "^0.21.0",
+    "@wxt-dev/module-svelte": "^2.0.0"
+  }
+}

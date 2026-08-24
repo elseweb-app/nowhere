@@ -3,7 +3,17 @@ import globals from 'globals'
 
 export default [
   {
-    ignores: ['node_modules', 'dist', 'build', '.wxt', 'coverage'],
+    // Un-prefixed patterns only match a top-level directory of that name; every one of
+    // these needs the `**/` prefix or a package's own dist/build/.output directory
+    // (e.g. packages/client/dist, apps/extension/.output) silently escapes ignoring.
+    ignores: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/build/**',
+      '**/.wxt/**',
+      '**/.output/**',
+      '**/coverage/**',
+    ],
   },
   {
     files: ['**/*.js'],
@@ -16,6 +26,13 @@ export default [
       },
     },
     rules: js.configs.recommended.rules,
+  },
+  {
+    // The extension is the one place the MV3 `chrome.*` extension APIs exist.
+    files: ['apps/extension/**/*.js'],
+    languageOptions: {
+      globals: { ...globals.webextensions },
+    },
   },
   {
     // The Supabase edge function is the one file in the repo that runs on Deno rather

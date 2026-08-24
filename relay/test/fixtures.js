@@ -10,6 +10,11 @@ import {
   canonicalizeAttestation,
   sha256,
   sign,
+  buildWorkProof,
+  mineWorkProof,
+  generateAuthorizationId,
+  signDelegation,
+  signRevocation,
 } from '@elseweb/protocol'
 
 export function createFakeClock(startSeconds = 1_700_000_000) {
@@ -57,9 +62,16 @@ export function makeTestConfig(overrides = {}) {
     },
     listing: { maxEvents: 20, maxPerAuthor: 3, candidatePoolSize: 100, ...overrides.listing },
     feed: { maxEvents: 20, maxPerAuthor: 3, candidatePoolSize: 100, ...overrides.feed },
+    compute: {
+      jobAdmissionDifficulty: 4,
+      jobTtlSeconds: 120,
+      freshnessWindowSeconds: 300,
+      listingLimit: 50,
+      ...overrides.compute,
+    },
     ...Object.fromEntries(
       Object.entries(overrides).filter(
-        ([key]) => !['pow', 'attestations', 'listing', 'feed'].includes(key)
+        ([key]) => !['pow', 'attestations', 'listing', 'feed', 'compute'].includes(key)
       )
     ),
   }
@@ -141,6 +153,48 @@ export async function makeAttestation({
   const digest = await sha256(new TextEncoder().encode(canonicalizeAttestation(unsigned)))
   const sig = await sign(issuerPrivateKey, digest)
   return { ...unsigned, sig }
+}
+
+export async function buildMinedWorkProof({ subject, resource, now, difficulty = 4 }) {
+  const draft = buildWorkProof({ purpose: 'compute-admission', subject, resource, createdAt: now })
+  return mineWorkProof(draft, difficulty)
+}
+
+export async function buildSignedDelegation({
+  ownerPrivateKey,
+  ownerPubkey,
+  workerPubkey,
+  capabilities,
+  issuedAt,
+  expiresAt,
+}) {
+  const unsigned = {
+    v: 1,
+    type: 'worker-delegation',
+    authorization_id: generateAuthorizationId(),
+    owner_pubkey: ownerPubkey,
+    worker_pubkey: workerPubkey,
+    capabilities,
+    issued_at: issuedAt,
+    expires_at: expiresAt,
+  }
+  return signDelegation(unsigned, ownerPrivateKey)
+}
+
+export async function buildSignedRevocation({
+  ownerPrivateKey,
+  ownerPubkey,
+  authorizationId,
+  revokedAt,
+}) {
+  const unsigned = {
+    v: 1,
+    type: 'worker-revocation',
+    authorization_id: authorizationId,
+    owner_pubkey: ownerPubkey,
+    revoked_at: revokedAt,
+  }
+  return signRevocation(unsigned, ownerPrivateKey)
 }
 
 // A store whose every method throws if called. Used to prove that a rejection at a

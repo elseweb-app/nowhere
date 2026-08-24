@@ -4,10 +4,17 @@
 // relay expects.
 
 import { assertStorePort } from './store.js'
+import { assertComputeStorePort } from './compute-store.js'
 import { routeRequest } from './router.js'
 
-export function createRelayApp({ store, config, clock }) {
+// `computeStore` is optional: a binding that has not opted into the compute-transport
+// endpoints (root AGENTS.md's compute-bridge direction) can omit it and every
+// /compute/* route 404s via routeRequest's fallback, same as any other unrouted path.
+export function createRelayApp({ store, config, clock, computeStore }) {
   assertStorePort(store)
+  if (computeStore !== undefined) {
+    assertComputeStorePort(computeStore)
+  }
   if (!config) {
     throw new TypeError('createRelayApp requires a config object')
   }
@@ -16,11 +23,12 @@ export function createRelayApp({ store, config, clock }) {
   }
 
   async function handle(request) {
-    return routeRequest(request, { store, config, clock })
+    return routeRequest(request, { store, config, clock, computeStore })
   }
 
   return { handle }
 }
 
 export { assertStorePort } from './store.js'
+export { assertComputeStorePort } from './compute-store.js'
 export { buildPolicy, keyStatus, resolveTier } from './policy.js'
