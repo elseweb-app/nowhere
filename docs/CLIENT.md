@@ -1,6 +1,6 @@
 # Building on ElseWeb without the extension
 
-`@elseweb/client` is the whole ElseWeb client. The browser extension is one host of it —
+`@elseweb-app/client` is the whole ElseWeb client. The browser extension is one host of it —
 not a prerequisite. Anything that can run JavaScript and make an HTTP request can join
 the network: a SvelteKit page, a Node script, a mobile WebView, a relay explorer, a bot.
 This document is that path, in depth.
@@ -20,7 +20,7 @@ A relay speaks a small, strict HTTP contract (SPEC.md sections 4–16): canonica
 encoding, content-addressed ids, proof-of-work, Ed25519 signatures, a policy document per
 relay, typed rejection codes. None of that is product logic, and all of it has to be
 gotten exactly right or two honest clients silently stop agreeing with each other. That
-is what `@elseweb/client` owns, so that a consumer only ever supplies product data:
+is what `@elseweb-app/client` owns, so that a consumer only ever supplies product data:
 
 - **URL normalization and target derivation** — turning whatever URL a user is looking at
   into the `page_id`/`page_url`/`anchor` triple two independent users converge on
@@ -47,27 +47,28 @@ What is left for you to supply: the storage port, the UI, and the text people wr
 
 ## 2. Install and instantiate
 
-Both `@elseweb/client` and `@elseweb/protocol` are `"private": true` in this repository
-today. There is no npm publish set up yet — do not write `npm install @elseweb/client`
-into a project outside this monorepo expecting it to resolve, because it will not.
+`@elseweb/protocol` is `"private": true` — it never has its own registry entry, because
+esbuild bundles it straight into `@elseweb-app/client`'s `dist/index.js`. The client
+package itself is public, published to GitHub Packages, not npmjs.com.
 
-Two ways to actually depend on it right now:
+Two ways to actually depend on it:
 
 - **From inside this workspace.** Any package added under `apps/*`, `packages/*` or
-  `relay/` and listed in `pnpm-workspace.yaml` gets `@elseweb/client` via
-  `"@elseweb/client": "workspace:*"` in its `package.json`, resolved by pnpm's workspace
-  linking — no registry involved. This is how `relay/test/e2e.test.js` consumes it, and
-  it is the only way this package is consumed anywhere in the codebase today.
-- **As a git dependency**, from an external repository, once this one is public:
-  `"@elseweb/client": "git+https://github.com/<org>/nowhere.git#path:packages/client"`
-  (pnpm and npm both support a `path:` fragment into a monorepo subdirectory for a git
-  dependency). This works today if you can reach the repository, but nobody has verified
-  it end to end yet — treat it as the documented intent, not a proven path.
+  `relay/` and listed in `pnpm-workspace.yaml` gets `@elseweb-app/client` via
+  `"@elseweb-app/client": "workspace:*"` in its `package.json`, resolved by pnpm's workspace
+  linking — no registry involved. This is how `relay/test/e2e.test.js` consumes it.
+- **From an external project**, via `npm install @elseweb-app/client` or
+  `pnpm add @elseweb-app/client` — but only after pointing your package manager at
+  GitHub's registry for the `@elseweb-app` scope and supplying a token with
+  `read:packages`, since **GitHub Packages requires an authenticated install even for a
+  public package**. `packages/client/README.md`'s "Install from outside this workspace"
+  section has the exact `.npmrc` and the one-time token setup; this document does not
+  repeat it.
 
 Once resolved, the shape is what the README shows:
 
 ```js
-import { createElsewebClient } from '@elseweb/client'
+import { createElsewebClient } from '@elseweb-app/client'
 
 const client = createElsewebClient({
   relays: ['https://relay.example.com'],
@@ -421,7 +422,7 @@ Every failure surfaces as one type: `ElsewebError`, always with a stable `code` 
 `instanceof` across a bundler boundary:
 
 ```js
-import { isElsewebError } from '@elseweb/client'
+import { isElsewebError } from '@elseweb-app/client'
 ```
 
 | Code | Action | Meaning |
@@ -538,7 +539,7 @@ is in-process (fine for a background service worker or a Node process; not fine 
 blocking a page's UI thread). To move it off-thread, the host supplies the worker factory:
 
 ```js
-const worker = new Worker(new URL('@elseweb/client/src/pow-worker.js', import.meta.url), {
+const worker = new Worker(new URL('@elseweb-app/client/src/pow-worker.js', import.meta.url), {
   type: 'module',
 })
 ```
@@ -615,13 +616,13 @@ storage port you already have for identity (§3) and pass it back in on the next
 ## 10. A complete worked example
 
 This is the same flow `relay/test/e2e.test.js` runs — a real HTTP relay on a real socket,
-driven only through the public `@elseweb/client` API, with no extension, no ElseWeb UI, no
+driven only through the public `@elseweb-app/client` API, with no extension, no ElseWeb UI, no
 Supabase and nothing from `relay/src` touched on the client side of the wire. It was run
 directly as a Node script against the reference relay to confirm every call in it actually
 works as written.
 
 ```js
-import { createElsewebClient } from '@elseweb/client'
+import { createElsewebClient } from '@elseweb-app/client'
 // The reference relay, started exactly the way its own end-to-end test does — this half
 // is specific to testing against the in-repo relay; a real deployment is just a URL.
 import { createRelayApp } from '@elseweb/relay'
@@ -721,7 +722,7 @@ Not done, on purpose, for now:
   while resting on nothing the author actually paid for. A host that wants tier/age folded
   into ranking has to fetch `GET /keys/{pubkey}` itself, per author, and combine it into
   its own `standingByPubkey` before calling `tallyVotes()`/`rankEvents()` directly (both
-  are exported from `@elseweb/client` for exactly this kind of composition).
+  are exported from `@elseweb-app/client` for exactly this kind of composition).
 - **Relay-set persistence is the host's job**, not this package's — see §9.
 - **Web Worker mining is not wired in by default** — the entry point exists
   (`pow-worker.js`), but nothing in `createElsewebClient` currently drives it; see §8.

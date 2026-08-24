@@ -2,7 +2,7 @@
 //
 // "Can a completely separate browser application join ElseWeb without the extension?"
 // Everything below answers that with code: a real HTTP relay on a real socket, driven
-// only through the public `@elseweb/client` API. No extension, no ElseWeb UI, no Supabase,
+// only through the public `@elseweb-app/client` API. No extension, no ElseWeb UI, no Supabase,
 // no Docker, and nothing imported from `relay/src` on the client side of the wire.
 //
 // The client's storage port is a plain Map here. In a browser it is IndexedDB; in the
@@ -10,7 +10,7 @@
 // which is the property that lets three hosts share one implementation.
 
 import { describe, it, expect, afterEach } from 'vitest'
-import { createElsewebClient } from '@elseweb/client'
+import { createElsewebClient } from '@elseweb-app/client'
 import { createRelayApp } from '../src/index.js'
 import { createMemoryStore } from './memory-store.js'
 import { makeTestConfig } from './fixtures.js'

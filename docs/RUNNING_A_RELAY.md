@@ -127,7 +127,7 @@ pnpm build
 These are the actual root scripts in `package.json`; there is no
 `pnpm --filter relay dev` and none is documented here because it does not exist. All
 four commands above were run against this repository while writing this document:
-`pnpm test` passed 368 tests across 27 files (including `relay/test/e2e.test.js`,
+`pnpm test` passed 431 tests across 31 files (including `relay/test/e2e.test.js`,
 `relay/test/verify.test.js`, `relay/test/policy.test.js`, `relay/test/quotas.test.js`
 and `relay/test/feed.test.js`), `pnpm lint` and `pnpm build` both passed clean.
 
@@ -459,14 +459,14 @@ curl -s http://127.0.0.1:PORT/events
 
 ## 9. Publishing a test event
 
-Do not hand-build a signature or mine a nonce by hand. `@elseweb/client` does both,
+Do not hand-build a signature or mine a nonce by hand. `@elseweb-app/client` does both,
 along with deriving the page identity and talking to your relay set. This mirrors
 what `relay/test/e2e.test.js` does against the in-memory relay, adapted to talk to
 any relay by URL:
 
 ```js
 // publish-test-event.mjs
-import { createElsewebClient } from '@elseweb/client'
+import { createElsewebClient } from '@elseweb-app/client'
 
 function createMemoryIdentityStore() {
   const values = new Map()

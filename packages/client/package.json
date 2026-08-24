@@ -1,8 +1,11 @@
 {
-  "name": "@elseweb/client",
+  "name": "@elseweb-app/client",
   "version": "0.1.0",
+  "description": "Everything an ElseWeb client does that is not UI: identity, relay pool, publishing, reading, ranking. Platform-independent — no DOM, no browser storage API — so it runs unchanged in a browser extension, a web page, or a Node script.",
   "type": "module",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "exports": {
@@ -10,6 +13,15 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elseweb-app/nowhere.git",
+    "directory": "packages/client"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "public"
   },
   "scripts": {
     "build": "node build.mjs"

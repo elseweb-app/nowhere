@@ -1,4 +1,4 @@
-# `@elseweb/client`
+# `@elseweb-app/client`
 
 Everything a client does that is not user interface: the relay set, publishing, reading
 and merging, key management, proof-of-work and ranking.
@@ -13,10 +13,45 @@ client; the browser extension is one host of it, not a prerequisite.
 
 ---
 
+## Install from outside this workspace
+
+`@elseweb-app/client` is published to [GitHub Packages](https://github.com/elseweb-app/nowhere/pkgs/npm/client),
+not npmjs.com. **GitHub Packages requires an authenticated install even for a public
+package** — a plain `npm install` with no configuration will 404. One-time setup:
+
+1. Create a GitHub [personal access token (classic)](https://github.com/settings/tokens)
+   with at least the `read:packages` scope. (A fine-grained token does not currently
+   support package read access the same way; use a classic token.)
+2. Add an `.npmrc` to your project (not this repository — the project consuming the
+   package) that maps the `@elseweb-app` scope to GitHub's registry and supplies the
+   token:
+
+   ```ini
+   @elseweb-app:registry=https://npm.pkg.github.com
+   //npm.pkg.github.com/:_authToken=${GITHUB_PACKAGES_TOKEN}
+   ```
+
+   Set `GITHUB_PACKAGES_TOKEN` in your shell environment (or your CI's secret store) to
+   the token from step 1 — never commit the token itself.
+3. Install as usual:
+
+   ```bash
+   npm install @elseweb-app/client
+   # or
+   pnpm add @elseweb-app/client
+   ```
+
+To try a specific version without adding it to a project, `npm view @elseweb-app/client`
+works the same way once the `.npmrc` above is in place.
+
+Inside this monorepo, none of the above applies — `packages/client` is consumed via
+`"@elseweb-app/client": "workspace:*"`, resolved by pnpm's workspace linking with no
+registry involved (this is how `relay/test/e2e.test.js` consumes it).
+
 ## 1. Instantiating the client
 
 ```js
-import { createElsewebClient } from '@elseweb/client'
+import { createElsewebClient } from '@elseweb-app/client'
 
 const client = createElsewebClient({
   relays: ['https://relay.example.com'],
@@ -183,7 +218,7 @@ saying what to do about it.
 | `MINING_ABORTED` / `MINING_EXHAUSTED` | `abandon` / `retry_later` | Local mining outcome |
 
 ```js
-import { isElsewebError } from '@elseweb/client'
+import { isElsewebError } from '@elseweb-app/client'
 
 try {
   await client.publishShare({ pageUrl, text })
@@ -244,3 +279,15 @@ Not done, and deliberately out of this phase:
 - **Relay-set persistence.** The set is a constructor argument; a host that wants it
   remembered stores it through the same port it uses for identity.
 - **Web Worker mining by default.** The entry exists; wiring it is the host's choice.
+
+## 8. Releasing a new version (maintainers)
+
+1. Bump `version` in `packages/client/package.json` and commit.
+2. `git tag client-vX.Y.Z && git push origin client-vX.Y.Z`.
+3. That tag push triggers `.github/workflows/publish-client.yml`, which builds
+   `dist/` and runs `pnpm publish` against GitHub Packages using the workflow's own
+   `GITHUB_TOKEN` — no manual npm login and no token handling on your machine.
+
+Only this package is published this way. `@elseweb/protocol` stays an unpublished
+workspace member — esbuild bundles it into this package's `dist/index.js`, so nothing
+external ever needs to install it separately.

@@ -55,7 +55,7 @@ importers:
         specifier: workspace:*
         version: link:../packages/protocol
     devDependencies:
-      '@elseweb/client':
+      '@elseweb-app/client':
         specifier: workspace:*
         version: link:../packages/client
 

@@ -1,0 +1,40 @@
+name: Publish @elseweb-app/client
+
+# Triggered by pushing a tag like client-v0.1.0. Bump packages/client/package.json's
+# version, commit, then `git tag client-vX.Y.Z && git push origin client-vX.Y.Z` — that
+# push is what runs this. Only packages/client is versioned and published this way;
+# packages/protocol and relay/ stay private workspace members (protocol is bundled
+# into the client's dist by esbuild, so it never needs its own registry entry).
+
+on:
+  push:
+    tags:
+      - 'client-v*.*.*'
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.17.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://npm.pkg.github.com
+          scope: '@elseweb-app'
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm --filter @elseweb-app/client build
+
+      - run: pnpm publish --filter @elseweb-app/client --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

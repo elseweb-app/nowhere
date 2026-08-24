@@ -33,7 +33,7 @@ detail" is a structural fact rather than an intention:
 The core must never import anything from `supabase/`. If it needs to, the port is missing
 a method — add it to the port, not a special case to the core.
 
-`test/e2e.test.js` depends on `packages/client`, which is why `@elseweb/client` is a
+`test/e2e.test.js` depends on `packages/client`, which is why `@elseweb-app/client` is a
 **devDependency** here. That is test-only and does not reverse the dependency direction in
 root `AGENTS.md` section 7: nothing in `src/` may import a client.
 

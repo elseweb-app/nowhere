@@ -376,7 +376,7 @@ precomputed. Users should be told this plainly.
                  browser extension  (not built yet)
                         │
                         │
-   web client ───── @elseweb/client ───── third-party client
+   web client ───── @elseweb-app/client ───── third-party client
                         │
                         │
                 @elseweb/protocol
@@ -393,15 +393,20 @@ Requires **Node ≥ 24** (for WebCrypto Ed25519) and **pnpm 11.17.0**.
 
 ```bash
 pnpm install
-pnpm test      # 368 tests: protocol, adapters, client, relay, end to end
+pnpm test      # 431 tests: protocol, adapters, client, relay, end to end
 pnpm lint
 pnpm build
 ```
 
 ### Use ElseWeb from JavaScript
 
+`@elseweb-app/client` is published to GitHub Packages, so it installs like any other
+scoped package once your package manager is pointed at that registry — see
+[`packages/client/README.md`](packages/client/README.md) for the one-time `.npmrc`
+setup (GitHub Packages requires an authenticated install even for a public package).
+
 ```js
-import { createElsewebClient } from '@elseweb/client'
+import { createElsewebClient } from '@elseweb-app/client'
 
 const client = createElsewebClient({
   relays: ['https://relay.example.com'],
@@ -489,7 +494,7 @@ repository root is the contributor guide, and nested `AGENTS.md` files under `pa
 and `relay/` add to it.
 
 The end-to-end proof is `relay/test/e2e.test.js`: it starts a real HTTP relay on an
-ephemeral port and drives it through the public `@elseweb/client` API only — no Docker, no
+ephemeral port and drives it through the public `@elseweb-app/client` API only — no Docker, no
 Supabase account, no extension.
 
 ## Status
@@ -497,16 +502,15 @@ Supabase account, no extension.
 Experimental. Implemented and tested:
 
 - The protocol: schemas, canonicalization, crypto, page identity, PoW, attestations, key transfer
-- The client: identity, relay pool, transport, policy discovery, publishing, reading, threading, ranking
+- The client: identity, relay pool, transport, policy discovery, publishing, reading, threading, ranking — published to GitHub Packages as `@elseweb-app/client`
 - The reference relay: the full verification pipeline, policy, quotas, feed, and a Supabase binding
 - Site adapters for x.com and a generic fallback
 
 Not built yet:
 
-- **The browser extension.** It becomes another host of `@elseweb/client`; none of it changes the packages.
+- **The browser extension.** It becomes another host of `@elseweb-app/client`; none of it changes the packages.
 - **The membership issuer.** Attestations verify, but nothing mints them.
 - **The extension's compute bridge.** Reaching a local OpenAI-compatible endpoint and WebGPU/Ollama-style compute providers over the protocol is a direction, not yet specified.
-- **npm publishing.** Packages are consumed from this workspace or as a git dependency.
 - **Key tier and age in ranking.** Needs a per-author `/keys/{pubkey}` call the client does not currently make.
 - **Event retention.** Nothing prunes stored events.
 

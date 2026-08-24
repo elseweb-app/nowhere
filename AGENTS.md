@@ -79,13 +79,20 @@ consume it unchanged. That is the reason client logic lives in a package rather 
 in `apps/extension`.
 
 `relay/` is a workspace member so its tests run with everyone else's. The dependency
-direction is unchanged: nothing in `relay/src` may import a client, and `@elseweb/client`
+direction is unchanged: nothing in `relay/src` may import a client, and `@elseweb-app/client`
 appears there only as a **devDependency**, for the end-to-end test that drives a real relay
 over HTTP.
 
 **The client is the first finished vertical, not the extension.** `packages/client` is
 usable today by any browser application — see `packages/client/README.md`. The extension
 becomes another host of it rather than the place any of it lives.
+
+`packages/client` is published to GitHub Packages as `@elseweb-app/client`, so it is
+consumable from outside this workspace too, not only via `workspace:*`. See
+`packages/client/README.md` §"Install from outside this workspace" and
+`.github/workflows/publish-client.yml` for how a release is cut. `packages/protocol` and
+`relay/` stay unpublished workspace members — protocol is bundled into the client's
+build output by esbuild, so nothing external ever needs to install it directly.
 
 ## 4. Setup and commands
 
@@ -102,7 +109,7 @@ with `pnpm -r`.
 
 `pnpm test` covers `packages/*/test` and `relay/test`. The end-to-end proof is
 `relay/test/e2e.test.js`: it starts a real HTTP relay on an ephemeral port and drives it
-through the public `@elseweb/client` API only — no Docker, no Supabase account, no
+through the public `@elseweb-app/client` API only — no Docker, no Supabase account, no
 extension.
 
 Not built yet, so the command does not exist either: `pnpm --filter extension dev`.
