@@ -314,9 +314,9 @@ Access-Control-Allow-Methods: GET, POST, OPTIONS
 Access-Control-Allow-Headers: content-type
 ```
 
-Browser consumers need this. A page on `elseweb.lol` — or any other site — fetching your
-relay from JavaScript is a cross-origin request, and without these headers the browser
-refuses to hand the response to the page even though the relay answered correctly.
+Browser consumers need this. A page on some other origin fetching your relay from
+JavaScript is a cross-origin request, and without these headers the browser refuses to
+hand the response to the page even though the relay answered correctly.
 
 `*` is deliberate rather than careless: a relay's read endpoints are public by design, and
 an allowlist of origins would make the relay pick which clients may exist, which is exactly

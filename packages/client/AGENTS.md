@@ -4,14 +4,16 @@ Everything a client does that is not user interface: the relay pool, publishing,
 and merging, key management, and ranking. Read the root `AGENTS.md` first, and
 `packages/protocol/SPEC.md` before touching anything on the wire.
 
-**Three hosts consume this package**: the extension, the website, and — in a later phase —
-the Capacitor mobile app. That is the whole reason it exists. Logic that lives in an app
-has to be written three times and will drift; logic that lives here is written once.
+**Every host consumes this package**: the extension in this repo, and any other client —
+a web app, a mobile app, a third-party product — built outside it. That is the whole
+reason it exists as a package rather than living inside `apps/extension`: logic that
+lives in an app has to be rewritten per host and will drift; logic that lives here is
+written once.
 
 ## Platform independence
 
-This package MUST run unchanged in an MV3 service worker, in a SvelteKit page, and in a
-Capacitor WebView.
+This package MUST run unchanged in an MV3 service worker or any other JavaScript host —
+a SvelteKit page, a Capacitor WebView, a plain Node script.
 
 - No DOM. No `document`, no `window`, no Svelte.
 - No `chrome.*`, no `localStorage`, no Capacitor imports.

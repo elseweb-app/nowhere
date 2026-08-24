@@ -160,10 +160,10 @@ function createMemoryIdentityStore() {
 ```
 
 This is why the same package can sit inside `apps/extension` (backed by
-`chrome.storage.local`), `apps/web` (backed by IndexedDB), and eventually a Capacitor
-mobile app (backed by Capacitor Preferences), without a single `if (chrome)` branch
-anywhere in `packages/client`. The port is the platform boundary; everything on the
-client side of it is the same code, always.
+`chrome.storage.local`), a web app (backed by IndexedDB), or a Capacitor mobile app
+(backed by Capacitor Preferences), without a single `if (chrome)` branch anywhere in
+`packages/client`. The port is the platform boundary; everything on the client side of
+it is the same code, always.
 
 ## 4. Identity
 

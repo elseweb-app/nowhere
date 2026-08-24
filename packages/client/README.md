@@ -3,9 +3,10 @@
 Everything a client does that is not user interface: the relay set, publishing, reading
 and merging, key management, proof-of-work and ranking.
 
-It runs unchanged in an MV3 service worker, a SvelteKit page and a Capacitor WebView,
-because it contains no platform API at all. Storage and a clock are **ports you inject**;
-`fetch` is the one global it uses, and even that is injectable.
+It runs unchanged in an MV3 service worker or any other JavaScript host — a web page, a
+Capacitor WebView, a Node script — because it contains no platform API at all. Storage
+and a clock are **ports you inject**; `fetch` is the one global it uses, and even that
+is injectable.
 
 **No extension is required to join the ElseWeb network.** This package is the whole
 client; the browser extension is one host of it, not a prerequisite.

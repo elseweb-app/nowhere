@@ -11,20 +11,33 @@ one to the file you are editing wins; it adds to this file rather than replacing
 
 ## 1. What this is
 
-**ElseWeb** is a web2 layer that adapts itself to any website. It ships as a
-Manifest V3 Chrome extension. The MVP target is x.com.
+**ElseWeb** is a federated protocol for a social layer over the existing web, plus
+its reference implementations. This repository's job is narrow: **develop the
+protocol, and keep its documentation accurate.** End-user products built on top of
+it — including the first one already live — are out of scope here and live in
+their own repositories; they are just consumers of `packages/protocol` and
+`packages/client` like anyone else's client would be.
 
-When a user has the extension installed, they see a "share with ElseWeb" control
-next to x.com's own composer. The extension adapts its own UI into whatever page is
-open. Content shared through that control **never reaches x.com** — it is written to
-our own service. Every other user running the extension sees that content while they
-are on the same page.
+What this repo ships:
 
-The network is designed to be federated. For the MVP the relay is a Supabase edge
-function, but its HTTP contract is written to be a **standard** anyone can implement
-and self-host. Supabase is the reference implementation, not the architecture.
+- **The protocol** (`packages/protocol`) — the normative wire contract.
+- **A reference relay** (`relay/`) — the MVP binding is a Supabase edge function,
+  but the HTTP contract is written to be a **standard** anyone can implement and
+  self-host. Supabase is the reference implementation, not the architecture.
+- **A reference client** (`packages/client`) — everything a client does that is not
+  UI: identity, relay pool, publishing, reading, ranking.
+- **A generic protocol client** (`apps/extension`) — a Manifest V3 Chrome extension.
+  On a site with an adapter (x.com for the MVP) it shows a "share with ElseWeb"
+  control next to the host's own composer; content shared through it **never
+  reaches the host site** — it is written to the configured relay set, and every
+  other user of the extension sees it while on the same page. Beyond that social
+  surface, the extension also holds a protocol identity that can be imported from
+  any other client that generated one, and can act as a bridge — talking to a
+  local OpenAI-compatible endpoint (Ollama and similar) so that WebGPU/Ollama-style
+  compute providers can be reached over the same protocol. That compute-bridge
+  mechanism is a roadmap direction, not yet specified at the protocol level.
 
-Flow: `shared content -> relay -> other extension users on the same page`.
+Flow (social sharing): `shared content -> relay -> other clients on the same page`.
 
 ## 2. Non-negotiables
 
@@ -54,17 +67,16 @@ writing code.
 
 | Path | Contains | Does not contain |
 |---|---|---|
-| `apps/extension` | MV3 extension: WXT entrypoints, content script, background worker, popup/options, plain Svelte UI | SvelteKit, site selectors, protocol schemas, relay logic |
-| `apps/web` | ElseWeb site: SvelteKit — landing, docs, feed, the published relay standard | Extension UI, relay logic |
+| `apps/extension` | MV3 extension: WXT entrypoints, content script, background worker, popup/options, plain Svelte UI — the generic protocol client, including identity import and the local-endpoint compute bridge | SvelteKit, site selectors, protocol schemas, relay logic |
 | `packages/protocol` | `SPEC.md` and its implementation: event schemas, canonical serialization, crypto, proof-of-work, page identity | Browser APIs, network calls, storage |
 | `packages/client` | Relay pool, publishing, reading and merging, key management, ranking — everything a client does that is not UI | DOM, platform storage APIs, site selectors |
 | `packages/adapters` | Per-site adapters (x.com + generic fallback) | Network calls, storage, extension internals |
 | `relay/` | Reference relay: a portable core in `src/`, a Supabase binding in `supabase/`, migrations and RLS policies | Client code, anything Supabase-specific inside `src/` |
 
-A mobile app arrives in a later phase as a Capacitor wrapper around `apps/web`. It is not
-a fourth implementation: it consumes `packages/client` exactly as the other two do. This
-is the reason client logic lives in a package rather than in `apps/extension`, and it is
-why `apps/web` must stay statically buildable.
+`packages/client` is platform-independent (storage and clock are injected ports) so
+that any host — the extension here, or an external product in its own repo — can
+consume it unchanged. That is the reason client logic lives in a package rather than
+in `apps/extension`.
 
 `relay/` is a workspace member so its tests run with everyone else's. The dependency
 direction is unchanged: nothing in `relay/src` may import a client, and `@elseweb/client`
@@ -93,8 +105,8 @@ with `pnpm -r`.
 through the public `@elseweb/client` API only — no Docker, no Supabase account, no
 extension.
 
-Not built yet, so the commands do not exist either: `pnpm --filter extension dev` and
-`pnpm --filter web dev`. Add them to this list in the PR that makes them real, not before —
+Not built yet, so the command does not exist either: `pnpm --filter extension dev`.
+Add it to this list in the PR that makes it real, not before —
 a command listed here is a promise that it runs.
 
 ## 5. Language rules

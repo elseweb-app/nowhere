@@ -441,7 +441,7 @@ objects, so it works under Node and Deno alike. See
 | `relay/src` | The reference relay: verification, policy, quotas, feed, routing. Portable, storage-agnostic |
 | `relay/supabase` | The reference relay's Supabase binding: edge function, storage port over Postgres, migrations with RLS |
 | `relay/test` | An in-memory store, a `node:http` bridge, and the end-to-end proof |
-| `apps/extension`, `apps/web` | Not built yet |
+| `apps/extension` | Not built yet — the generic protocol client |
 
 Dependency direction is one-way: `apps → packages`, `packages/client → packages/protocol`,
 `packages/adapters → packages/protocol`, and `packages/protocol` depends on nothing internal.
@@ -505,7 +505,7 @@ Not built yet:
 
 - **The browser extension.** It becomes another host of `@elseweb/client`; none of it changes the packages.
 - **The membership issuer.** Attestations verify, but nothing mints them.
-- **`apps/web`.** No landing page, docs site or feed UI.
+- **The extension's compute bridge.** Reaching a local OpenAI-compatible endpoint and WebGPU/Ollama-style compute providers over the protocol is a direction, not yet specified.
 - **npm publishing.** Packages are consumed from this workspace or as a git dependency.
 - **Key tier and age in ranking.** Needs a per-author `/keys/{pubkey}` call the client does not currently make.
 - **Event retention.** Nothing prunes stored events.

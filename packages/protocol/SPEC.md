@@ -2,9 +2,9 @@
 
 Normative specification of the wire contract between a client and a relay.
 
-This document is the source of truth for the federation contract. Anything published on
-elseweb.app describing the relay standard is derived from this file, and the two are
-updated in the same pull request.
+This document is the source of truth for the federation contract. Any published page
+describing the relay standard, wherever it ends up hosted, is derived from this file,
+and the two are updated in the same pull request.
 
 **Implementing the endpoints in §10 is sufficient to run a relay.** Nothing in this
 document depends on Supabase, on our reference implementation in `relay/`, or on

@@ -11,8 +11,8 @@ Read the root `AGENTS.md` first.
 `SPEC.md` in this directory is the wire contract. Code here implements it; it does
 not define it. If code and spec disagree, the spec is right and the code is a bug.
 
-Anything published on elseweb.app describing the relay standard is derived from
-`SPEC.md`, and the two are updated in the same PR.
+Any published page describing the relay standard, wherever it ends up hosted, is
+derived from `SPEC.md`, and the two are updated in the same PR.
 
 ## Purity
 
@@ -60,7 +60,7 @@ If a function here needs to know how something is sent, it is in the wrong packa
   making one. Someone else's relay may already be speaking the old version.
 - Never make a validation rule stricter without treating it as breaking — data that used
   to be accepted would start being rejected.
-- Every schema change updates the relay standard documentation in `apps/web` and the
+- Every schema change updates any published relay standard documentation and the
   contract in `relay/AGENTS.md` in the same PR.
 
 ## No thresholds, and no privileged parties

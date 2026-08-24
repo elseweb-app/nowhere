@@ -56,9 +56,8 @@ Rules:
   cases apart will either retry forever or give up on a recoverable error.
 - The policy document is served and kept truthful. A client that reads it and complies
   must not then be rejected — a stale policy document is a real bug, not cosmetic.
-- Changing the contract means changing `packages/protocol` and the published standard in
-  `apps/web` in the same PR. See the breaking-change rule in
-  `packages/protocol/AGENTS.md`.
+- Changing the contract means changing `packages/protocol` and any published standard
+  page in the same PR. See the breaking-change rule in `packages/protocol/AGENTS.md`.
 
 ## Anti-flood: this is where policy lives
 
