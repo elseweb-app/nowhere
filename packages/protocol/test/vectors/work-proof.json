@@ -1,0 +1,48 @@
+{
+  "window_seconds": 300,
+  "now": 1755900100,
+  "mined": [
+    {
+      "required_difficulty": 8,
+      "work_proof": {
+        "v": 1,
+        "type": "work-proof",
+        "purpose": "compute-admission",
+        "subject": "020bd427446b723424d80d2cad352ba3df3649d0ef8faae0ca7eb25443941b29",
+        "resource": "job-request-1",
+        "created_at": 1755900000,
+        "nonce": 59,
+        "id": "000cc68586c876d8f34454c48ba0d78b8e9b3f16bd824f1b2c3b2bbc37595a2b"
+      },
+      "canonical": "{\"created_at\":1755900000,\"nonce\":59,\"purpose\":\"compute-admission\",\"resource\":\"job-request-1\",\"subject\":\"020bd427446b723424d80d2cad352ba3df3649d0ef8faae0ca7eb25443941b29\",\"type\":\"work-proof\",\"v\":1}"
+    },
+    {
+      "required_difficulty": 12,
+      "work_proof": {
+        "v": 1,
+        "type": "work-proof",
+        "purpose": "compute-admission",
+        "subject": "020bd427446b723424d80d2cad352ba3df3649d0ef8faae0ca7eb25443941b29",
+        "resource": "job-request-1",
+        "created_at": 1755900000,
+        "nonce": 59,
+        "id": "000cc68586c876d8f34454c48ba0d78b8e9b3f16bd824f1b2c3b2bbc37595a2b"
+      },
+      "canonical": "{\"created_at\":1755900000,\"nonce\":59,\"purpose\":\"compute-admission\",\"resource\":\"job-request-1\",\"subject\":\"020bd427446b723424d80d2cad352ba3df3649d0ef8faae0ca7eb25443941b29\",\"type\":\"work-proof\",\"v\":1}"
+    },
+    {
+      "required_difficulty": 16,
+      "work_proof": {
+        "v": 1,
+        "type": "work-proof",
+        "purpose": "compute-admission",
+        "subject": "020bd427446b723424d80d2cad352ba3df3649d0ef8faae0ca7eb25443941b29",
+        "resource": "job-request-1",
+        "created_at": 1755900000,
+        "nonce": 127119,
+        "id": "0000d0e05276049f14e8f77db885de108f3384beb295bf24336587f2933c84f5"
+      },
+      "canonical": "{\"created_at\":1755900000,\"nonce\":127119,\"purpose\":\"compute-admission\",\"resource\":\"job-request-1\",\"subject\":\"020bd427446b723424d80d2cad352ba3df3649d0ef8faae0ca7eb25443941b29\",\"type\":\"work-proof\",\"v\":1}"
+    }
+  ]
+}

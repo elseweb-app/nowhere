@@ -29,6 +29,33 @@ export {
 } from './key-transfer.js'
 
 export {
+  generateChallengeNonce,
+  canonicalizeChallenge,
+  signChallenge,
+  verifyChallenge,
+} from './challenge.js'
+
+export {
+  generateAuthorizationId,
+  canonicalizeDelegation,
+  canonicalizeRevocation,
+  signDelegation,
+  signRevocation,
+  verifyDelegation,
+  verifyRevocation,
+} from './delegation.js'
+
+export {
+  canonicalizeReceipt,
+  canonicalizeReceiptForCountersign,
+  signReceiptAsWorker,
+  signReceiptAsRequester,
+  verifyReceipt,
+} from './receipt.js'
+
+export { buildWorkProof, mineWorkProof, verifyWorkProof } from './work-proof.js'
+
+export {
   EventSchema,
   ShareSchema,
   ReplySchema,
@@ -37,10 +64,20 @@ export {
   PolicySchema,
   ErrorEnvelopeSchema,
   KeyStatusSchema,
+  ProofOfControlChallengeSchema,
+  WorkerDelegationSchema,
+  WorkerRevocationSchema,
+  ComputeReceiptSchema,
+  WorkProofSchema,
   parseEvent,
   safeParseEvent,
   safeParsePolicy,
   safeParseErrorEnvelope,
   safeParseAttestation,
   safeParseKeyStatus,
+  safeParseChallenge,
+  safeParseDelegation,
+  safeParseRevocation,
+  safeParseReceipt,
+  safeParseWorkProof,
 } from './schemas.js'

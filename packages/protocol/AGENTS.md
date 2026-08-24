@@ -49,6 +49,17 @@ If a function here needs to know how something is sent, it is in the wrong packa
 - **Key transfer envelope** — the encrypted format that moves an identity between
   devices. Keys are generated **extractable**; a non-extractable key strands its owner
   and cannot be fixed after issuance.
+- **Proof-of-control challenges** (`challenge.js`, SPEC.md §17) — lets a consumer
+  verify that whoever submitted a pubkey actually controls it, by having the subject
+  key sign a challenge scoped to one consumer and one action.
+- **Worker/device delegation** (`delegation.js`, SPEC.md §18) — lets one identity
+  authorize another as a worker with bounded capabilities, plus its revocation.
+- **Compute receipts** (`receipt.js`, SPEC.md §19) — worker-signed, optionally
+  requester-countersigned proof that a compute job happened, without carrying its
+  prompt or result.
+- **Generic work-proof** (`work-proof.js`, SPEC.md §21) — admission-control
+  proof-of-work for a non-event action (a compute job), reusing `pow.js`'s mining and
+  verification unmodified rather than distorting the event schema.
 - **Schema version** — the version field carried by every event.
 
 ## Changing a schema
@@ -73,6 +84,13 @@ would make every relay in the federation obey our configuration.
 It also names no relay and no issuer. ElseWeb's membership issuer is a trusted
 issuer *for our clients*, configured at runtime — never a constant here. The moment a
 specific issuer key is hardcoded in this package, the protocol has a favourite.
+
+The compute primitives (challenge, delegation, receipt, work-proof) carry the same
+constraint further: no field anywhere in this package encodes currency, a balance, a
+price, a wallet, or any payment-provider detail, and no field encodes a runtime or
+provider name (Ollama, WebGPU, a specific model). `capabilities` and `capability` are
+an open, namespaced vocabulary precisely so nothing here has to know what will run on
+the other end.
 
 ## Tests
 

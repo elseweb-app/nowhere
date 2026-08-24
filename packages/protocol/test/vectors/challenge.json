@@ -1,0 +1,61 @@
+{
+  "cases": [
+    {
+      "name": "valid — subject signs its own proof of control",
+      "now": 1755900100,
+      "audience": "example-consumer",
+      "challenge": {
+        "v": 1,
+        "type": "proof-of-control",
+        "action": "link-account",
+        "audience": "example-consumer",
+        "subject": "79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664",
+        "resource": "account-42",
+        "nonce": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "issued_at": 1755900000,
+        "expires_at": 1755900300,
+        "sig": "42ef47556219be7adf622330e0c545cfc3fff0843ed1021556c58952766c751996a520b7e4bb181e8e55e24315921bb14e0d1e0a0a11926474f2c5548293d105"
+      },
+      "canonical": "{\"action\":\"link-account\",\"audience\":\"example-consumer\",\"expires_at\":1755900300,\"issued_at\":1755900000,\"nonce\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"resource\":\"account-42\",\"subject\":\"79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664\",\"type\":\"proof-of-control\",\"v\":1}",
+      "expect": "valid"
+    },
+    {
+      "name": "expired — signature is fine, the clock is not",
+      "now": 1755900300,
+      "audience": "example-consumer",
+      "challenge": {
+        "v": 1,
+        "type": "proof-of-control",
+        "action": "link-account",
+        "audience": "example-consumer",
+        "subject": "79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664",
+        "resource": "account-42",
+        "nonce": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "issued_at": 1755900000,
+        "expires_at": 1755900300,
+        "sig": "60c8bb8d7eb67d0cc3e372633f3fc47c5a44cd586fbb73be26904761f38810115aedee763664864a03284e0924133ceec946c995685679fee94db4cc5aea9d0f"
+      },
+      "canonical": "{\"action\":\"link-account\",\"audience\":\"example-consumer\",\"expires_at\":1755900300,\"issued_at\":1755900000,\"nonce\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"resource\":\"account-42\",\"subject\":\"79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664\",\"type\":\"proof-of-control\",\"v\":1}",
+      "expect": "expired"
+    },
+    {
+      "name": "signed by someone other than the claimed subject",
+      "now": 1755900100,
+      "audience": "example-consumer",
+      "challenge": {
+        "v": 1,
+        "type": "proof-of-control",
+        "action": "link-account",
+        "audience": "example-consumer",
+        "subject": "79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664",
+        "resource": "account-42",
+        "nonce": "cccccccccccccccccccccccccccccccc",
+        "issued_at": 1755900000,
+        "expires_at": 1755900300,
+        "sig": "3358062753fbefa303d507da818a4afef9cab46f46affd7a3d510b1f7b079fda7fa31c2a64f406c30bc0b136d3799ae0737387f94ddfaca6fccc83d5809f1206"
+      },
+      "canonical": "{\"action\":\"link-account\",\"audience\":\"example-consumer\",\"expires_at\":1755900300,\"issued_at\":1755900000,\"nonce\":\"cccccccccccccccccccccccccccccccc\",\"resource\":\"account-42\",\"subject\":\"79b5562e8fe654f94078b112e8a98ba7901f853ae695bed7e0e3910bad049664\",\"type\":\"proof-of-control\",\"v\":1}",
+      "expect": "signature_invalid"
+    }
+  ]
+}

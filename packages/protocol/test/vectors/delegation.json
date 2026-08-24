@@ -1,0 +1,112 @@
+{
+  "cases": [
+    {
+      "name": "valid — owner authorizes a distinct worker key",
+      "now": 1755900100,
+      "revoked_ids": [],
+      "delegation": {
+        "v": 1,
+        "type": "worker-delegation",
+        "authorization_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "owner_pubkey": "adc14011f82d1c56d956aa4f9d73d8858361a606048525e0d08c638dc75dd8c7",
+        "worker_pubkey": "882d0ea3b2864e7a587f3e698cea4459998312e655e05fa5e8b5119d8baac8cd",
+        "capabilities": [
+          "text.generate"
+        ],
+        "issued_at": 1755900000,
+        "expires_at": 1755990000,
+        "sig": "e01fdd66571aae9cc59efd68ea5550bbf29f25885ec9df2cb120bdff88cc46de44d3b019eac67b955c49b15e933f0a413c178c6e63d35404ead69ec14ec99d05"
+      },
+      "canonical": "{\"authorization_id\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"capabilities\":[\"text.generate\"],\"expires_at\":1755990000,\"issued_at\":1755900000,\"owner_pubkey\":\"adc14011f82d1c56d956aa4f9d73d8858361a606048525e0d08c638dc75dd8c7\",\"type\":\"worker-delegation\",\"v\":1,\"worker_pubkey\":\"882d0ea3b2864e7a587f3e698cea4459998312e655e05fa5e8b5119d8baac8cd\"}",
+      "expect": "valid"
+    },
+    {
+      "name": "expired — signature is fine, the clock is not",
+      "now": 1755990000,
+      "revoked_ids": [],
+      "delegation": {
+        "v": 1,
+        "type": "worker-delegation",
+        "authorization_id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "owner_pubkey": "adc14011f82d1c56d956aa4f9d73d8858361a606048525e0d08c638dc75dd8c7",
+        "worker_pubkey": "882d0ea3b2864e7a587f3e698cea4459998312e655e05fa5e8b5119d8baac8cd",
+        "capabilities": [
+          "text.generate"
+        ],
+        "issued_at": 1755900000,
+        "expires_at": 1755990000,
+        "sig": "4f11e4c37bfad44f361facaae78322ae6cb57faa10a64b840cdac74730b9ad4a54add9c9410a590882d0ca9a68dad59e6d55689151fde382d561ef02a42d0d07"
+      },
+      "canonical": "{\"authorization_id\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"capabilities\":[\"text.generate\"],\"expires_at\":1755990000,\"issued_at\":1755900000,\"owner_pubkey\":\"adc14011f82d1c56d956aa4f9d73d8858361a606048525e0d08c638dc75dd8c7\",\"type\":\"worker-delegation\",\"v\":1,\"worker_pubkey\":\"882d0ea3b2864e7a587f3e698cea4459998312e655e05fa5e8b5119d8baac8cd\"}",
+      "expect": "expired"
+    },
+    {
+      "name": "signed by someone other than the claimed owner",
+      "now": 1755900100,
+      "revoked_ids": [],
+      "delegation": {
+        "v": 1,
+        "type": "worker-delegation",
+        "authorization_id": "cccccccccccccccccccccccccccccccc",
+        "owner_pubkey": "adc14011f82d1c56d956aa4f9d73d8858361a606048525e0d08c638dc75dd8c7",
+        "worker_pubkey": "882d0ea3b2864e7a587f3e698cea4459998312e655e05fa5e8b5119d8baac8cd",
+        "capabilities": [
+          "text.generate"
+        ],
+        "issued_at": 1755900000,
+        "expires_at": 1755990000,
+        "sig": "04f0d96d865bed5db4e3c157865eb508119f3cba832ddeed6b5039e79632462f417605dfc4ca71ec876e6bd4a0581b4914cddb658610108b125def3d03d88706"
+      },
+      "canonical": "{\"authorization_id\":\"cccccccccccccccccccccccccccccccc\",\"capabilities\":[\"text.generate\"],\"expires_at\":1755990000,\"issued_at\":1755900000,\"owner_pubkey\":\"adc14011f82d1c56d956aa4f9d73d8858361a606048525e0d08c638dc75dd8c7\",\"type\":\"worker-delegation\",\"v\":1,\"worker_pubkey\":\"882d0ea3b2864e7a587f3e698cea4459998312e655e05fa5e8b5119d8baac8cd\"}",
+      "expect": "signature_invalid"
+    },
+    {
+      "name": "a key cannot delegate to itself, even with a valid signature",
+      "now": 1755900100,
+      "revoked_ids": [],
+      "delegation": {
+        "v": 1,
+        "type": "worker-delegation",
+        "authorization_id": "dddddddddddddddddddddddddddddddd",
+        "owner_pubkey": "adc14011f82d1c56d956aa4f9d73d8858361a606048525e0d08c638dc75dd8c7",
+        "worker_pubkey": "adc14011f82d1c56d956aa4f9d73d8858361a606048525e0d08c638dc75dd8c7",
+        "capabilities": [
+          "text.generate"
+        ],
+        "issued_at": 1755900000,
+        "expires_at": 1755990000,
+        "sig": "b45f5b17e961b1dd2263261df60dbb26ec9a25be171f3e4ab51fb17a6927fce00e7f1d088c87a0b04911e9fbe3e1311e2cbb38fb5ad19f6df2447d63da560e01"
+      },
+      "canonical": "{\"authorization_id\":\"dddddddddddddddddddddddddddddddd\",\"capabilities\":[\"text.generate\"],\"expires_at\":1755990000,\"issued_at\":1755900000,\"owner_pubkey\":\"adc14011f82d1c56d956aa4f9d73d8858361a606048525e0d08c638dc75dd8c7\",\"type\":\"worker-delegation\",\"v\":1,\"worker_pubkey\":\"adc14011f82d1c56d956aa4f9d73d8858361a606048525e0d08c638dc75dd8c7\"}",
+      "expect": "self_delegation"
+    }
+  ],
+  "revocations": [
+    {
+      "name": "valid — owner signs its own revocation",
+      "revocation": {
+        "v": 1,
+        "type": "worker-revocation",
+        "authorization_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "owner_pubkey": "adc14011f82d1c56d956aa4f9d73d8858361a606048525e0d08c638dc75dd8c7",
+        "revoked_at": 1755900500,
+        "sig": "71f085176b32cf3bab0b245b9a3d18af08824f70834348126e0b6b9f7513f0056ee7d618f171cc57fe801f3301eff7fe15dad73c9982669d16e15747123c1e0e"
+      },
+      "canonical": "{\"authorization_id\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"owner_pubkey\":\"adc14011f82d1c56d956aa4f9d73d8858361a606048525e0d08c638dc75dd8c7\",\"revoked_at\":1755900500,\"type\":\"worker-revocation\",\"v\":1}",
+      "expect": "valid"
+    },
+    {
+      "name": "signed by someone other than the claimed owner",
+      "revocation": {
+        "v": 1,
+        "type": "worker-revocation",
+        "authorization_id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "owner_pubkey": "adc14011f82d1c56d956aa4f9d73d8858361a606048525e0d08c638dc75dd8c7",
+        "revoked_at": 1755900500,
+        "sig": "5d46e9cdfcf4330c71bd23b61c5928e6d308254b83a4309316b18dd11df0b1eac102df966a6a5a78dded683523616cbed588853c0fa72dceb1900b30e2410901"
+      },
+      "canonical": "{\"authorization_id\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"owner_pubkey\":\"adc14011f82d1c56d956aa4f9d73d8858361a606048525e0d08c638dc75dd8c7\",\"revoked_at\":1755900500,\"type\":\"worker-revocation\",\"v\":1}",
+      "expect": "signature_invalid"
+    }
+  ]
+}

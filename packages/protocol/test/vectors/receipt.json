@@ -1,0 +1,121 @@
+{
+  "cases": [
+    {
+      "name": "valid — worker signs, no countersignature yet",
+      "receipt": {
+        "v": 1,
+        "type": "compute-receipt",
+        "job_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "requester_pubkey": "020bd427446b723424d80d2cad352ba3df3649d0ef8faae0ca7eb25443941b29",
+        "worker_pubkey": "882d0ea3b2864e7a587f3e698cea4459998312e655e05fa5e8b5119d8baac8cd",
+        "capability": "text.generate",
+        "usage": {
+          "unit": "tokens",
+          "amount": 512
+        },
+        "result_hash": "abababababababababababababababababababababababababababababababab",
+        "started_at": 1755900000,
+        "finished_at": 1755900030,
+        "worker_sig": "8b453fd396aa8fe5c9f34bc58eab62a875a0303763fdd41fec87e1e4902393293663ddc0cda00da7000e4176a3079faa2ce2cf8056bd88e9c3a46e51a12ab401"
+      },
+      "canonical_worker": "{\"capability\":\"text.generate\",\"finished_at\":1755900030,\"job_id\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"requester_pubkey\":\"020bd427446b723424d80d2cad352ba3df3649d0ef8faae0ca7eb25443941b29\",\"result_hash\":\"abababababababababababababababababababababababababababababababab\",\"started_at\":1755900000,\"type\":\"compute-receipt\",\"usage\":{\"amount\":512,\"unit\":\"tokens\"},\"v\":1,\"worker_pubkey\":\"882d0ea3b2864e7a587f3e698cea4459998312e655e05fa5e8b5119d8baac8cd\"}",
+      "canonical_countersign": null,
+      "expect": "valid",
+      "countersigned": false
+    },
+    {
+      "name": "valid and countersigned — requester confirms receipt",
+      "receipt": {
+        "v": 1,
+        "type": "compute-receipt",
+        "job_id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "requester_pubkey": "020bd427446b723424d80d2cad352ba3df3649d0ef8faae0ca7eb25443941b29",
+        "worker_pubkey": "882d0ea3b2864e7a587f3e698cea4459998312e655e05fa5e8b5119d8baac8cd",
+        "capability": "text.generate",
+        "usage": {
+          "unit": "tokens",
+          "amount": 512
+        },
+        "result_hash": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+        "started_at": 1755900000,
+        "finished_at": 1755900030,
+        "worker_sig": "d70cb12a11039cf928a1cb66f7a03573e730071950208695fccafd8e9655e8f8bc633ba840715529e8bbdb46033239ee4627e5d6e3a4d88f04c3bdb5b529f70b",
+        "requester_sig": "835ddf01e674fe6fb1133aad957428a2fa82633cf0bb31f1ceaa2fd48149a715d56eea403e51df5cf3deeafab6e5c84471c1fde5c10427169f64847c94b17d0e"
+      },
+      "canonical_worker": "{\"capability\":\"text.generate\",\"finished_at\":1755900030,\"job_id\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"requester_pubkey\":\"020bd427446b723424d80d2cad352ba3df3649d0ef8faae0ca7eb25443941b29\",\"result_hash\":\"cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd\",\"started_at\":1755900000,\"type\":\"compute-receipt\",\"usage\":{\"amount\":512,\"unit\":\"tokens\"},\"v\":1,\"worker_pubkey\":\"882d0ea3b2864e7a587f3e698cea4459998312e655e05fa5e8b5119d8baac8cd\"}",
+      "canonical_countersign": "{\"capability\":\"text.generate\",\"finished_at\":1755900030,\"job_id\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"requester_pubkey\":\"020bd427446b723424d80d2cad352ba3df3649d0ef8faae0ca7eb25443941b29\",\"result_hash\":\"cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd\",\"started_at\":1755900000,\"type\":\"compute-receipt\",\"usage\":{\"amount\":512,\"unit\":\"tokens\"},\"v\":1,\"worker_pubkey\":\"882d0ea3b2864e7a587f3e698cea4459998312e655e05fa5e8b5119d8baac8cd\",\"worker_sig\":\"d70cb12a11039cf928a1cb66f7a03573e730071950208695fccafd8e9655e8f8bc633ba840715529e8bbdb46033239ee4627e5d6e3a4d88f04c3bdb5b529f70b\"}",
+      "expect": "valid",
+      "countersigned": true
+    },
+    {
+      "name": "worker signature does not verify",
+      "receipt": {
+        "v": 1,
+        "type": "compute-receipt",
+        "job_id": "cccccccccccccccccccccccccccccccc",
+        "requester_pubkey": "020bd427446b723424d80d2cad352ba3df3649d0ef8faae0ca7eb25443941b29",
+        "worker_pubkey": "882d0ea3b2864e7a587f3e698cea4459998312e655e05fa5e8b5119d8baac8cd",
+        "capability": "text.generate",
+        "usage": {
+          "unit": "tokens",
+          "amount": 512
+        },
+        "result_hash": "efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef",
+        "started_at": 1755900000,
+        "finished_at": 1755900030,
+        "worker_sig": "e4ca54c546c7b1aa984ec82ac8c529180b1f066a9b9dbeb92eea097ed6715217e75d0dfd3f9c0468503eca294d3c74a107e837d64518e1051ab997e387e7a404"
+      },
+      "canonical_worker": "{\"capability\":\"text.generate\",\"finished_at\":1755900030,\"job_id\":\"cccccccccccccccccccccccccccccccc\",\"requester_pubkey\":\"020bd427446b723424d80d2cad352ba3df3649d0ef8faae0ca7eb25443941b29\",\"result_hash\":\"efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef\",\"started_at\":1755900000,\"type\":\"compute-receipt\",\"usage\":{\"amount\":512,\"unit\":\"tokens\"},\"v\":1,\"worker_pubkey\":\"882d0ea3b2864e7a587f3e698cea4459998312e655e05fa5e8b5119d8baac8cd\"}",
+      "canonical_countersign": null,
+      "expect": "worker_signature_invalid",
+      "countersigned": false
+    },
+    {
+      "name": "requester countersignature does not verify",
+      "receipt": {
+        "v": 1,
+        "type": "compute-receipt",
+        "job_id": "dddddddddddddddddddddddddddddddd",
+        "requester_pubkey": "020bd427446b723424d80d2cad352ba3df3649d0ef8faae0ca7eb25443941b29",
+        "worker_pubkey": "882d0ea3b2864e7a587f3e698cea4459998312e655e05fa5e8b5119d8baac8cd",
+        "capability": "text.generate",
+        "usage": {
+          "unit": "tokens",
+          "amount": 512
+        },
+        "result_hash": "1212121212121212121212121212121212121212121212121212121212121212",
+        "started_at": 1755900000,
+        "finished_at": 1755900030,
+        "worker_sig": "e67e13bfc0599d14582c2eeaade3d87968adf58fbb4b24f936a4c6336f05e2cf2070ffe9e0905a6aa69cbf7f1bfa0006968ff3a419a1394303cacf154405290f",
+        "requester_sig": "3433a80cab2395abe19007a676530dc5bcf8940d65063ed5c700110cd8acade5e84d4e1461f7ebfa71cd6a9d5bbb9a7a7b836416b183ee65184839b117026c0f"
+      },
+      "canonical_worker": "{\"capability\":\"text.generate\",\"finished_at\":1755900030,\"job_id\":\"dddddddddddddddddddddddddddddddd\",\"requester_pubkey\":\"020bd427446b723424d80d2cad352ba3df3649d0ef8faae0ca7eb25443941b29\",\"result_hash\":\"1212121212121212121212121212121212121212121212121212121212121212\",\"started_at\":1755900000,\"type\":\"compute-receipt\",\"usage\":{\"amount\":512,\"unit\":\"tokens\"},\"v\":1,\"worker_pubkey\":\"882d0ea3b2864e7a587f3e698cea4459998312e655e05fa5e8b5119d8baac8cd\"}",
+      "canonical_countersign": "{\"capability\":\"text.generate\",\"finished_at\":1755900030,\"job_id\":\"dddddddddddddddddddddddddddddddd\",\"requester_pubkey\":\"020bd427446b723424d80d2cad352ba3df3649d0ef8faae0ca7eb25443941b29\",\"result_hash\":\"1212121212121212121212121212121212121212121212121212121212121212\",\"started_at\":1755900000,\"type\":\"compute-receipt\",\"usage\":{\"amount\":512,\"unit\":\"tokens\"},\"v\":1,\"worker_pubkey\":\"882d0ea3b2864e7a587f3e698cea4459998312e655e05fa5e8b5119d8baac8cd\",\"worker_sig\":\"e67e13bfc0599d14582c2eeaade3d87968adf58fbb4b24f936a4c6336f05e2cf2070ffe9e0905a6aa69cbf7f1bfa0006968ff3a419a1394303cacf154405290f\"}",
+      "expect": "requester_signature_invalid",
+      "countersigned": false
+    },
+    {
+      "name": "finished before it started",
+      "receipt": {
+        "v": 1,
+        "type": "compute-receipt",
+        "job_id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "requester_pubkey": "020bd427446b723424d80d2cad352ba3df3649d0ef8faae0ca7eb25443941b29",
+        "worker_pubkey": "882d0ea3b2864e7a587f3e698cea4459998312e655e05fa5e8b5119d8baac8cd",
+        "capability": "text.generate",
+        "usage": {
+          "unit": "tokens",
+          "amount": 512
+        },
+        "result_hash": "3434343434343434343434343434343434343434343434343434343434343434",
+        "started_at": 1755900030,
+        "finished_at": 1755900000,
+        "worker_sig": "41d59a15a0536b561ef441fb32b7a254905a666f793e2f96c0980f92c87f20c9f7f6cfd9716005f994a6726a5685ce71967a3aad643fbc16796f006ed7b50605"
+      },
+      "canonical_worker": "{\"capability\":\"text.generate\",\"finished_at\":1755900000,\"job_id\":\"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee\",\"requester_pubkey\":\"020bd427446b723424d80d2cad352ba3df3649d0ef8faae0ca7eb25443941b29\",\"result_hash\":\"3434343434343434343434343434343434343434343434343434343434343434\",\"started_at\":1755900030,\"type\":\"compute-receipt\",\"usage\":{\"amount\":512,\"unit\":\"tokens\"},\"v\":1,\"worker_pubkey\":\"882d0ea3b2864e7a587f3e698cea4459998312e655e05fa5e8b5119d8baac8cd\"}",
+      "canonical_countersign": null,
+      "expect": "invalid_timespan",
+      "countersigned": false
+    }
+  ]
+}

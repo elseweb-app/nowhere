@@ -40,6 +40,12 @@ const seqSeed = (start) =>
 
 const author = keyFromSeed(seqSeed(1))
 const issuer = keyFromSeed(seqSeed(33))
+// Additional deterministic role identities for the compute-primitive vectors
+// (challenge, delegation, receipt, work-proof) — kept here so every vector file
+// shares one set of test identities, same as author/issuer already do.
+const owner = keyFromSeed(seqSeed(65))
+const worker = keyFromSeed(seqSeed(97))
+const requester = keyFromSeed(seqSeed(129))
 const sign = (key, digest) => hex(crypto.sign(null, digest, key))
 
 const leadingZeroBits = (buf) => {
@@ -348,6 +354,9 @@ const keys = {
   note: 'Deterministic test keys. Raw 32-byte Ed25519 seeds. Never use these anywhere real.',
   author: { seed: author.seed, pubkey: author.pub },
   issuer: { seed: issuer.seed, pubkey: issuer.pub },
+  owner: { seed: owner.seed, pubkey: owner.pub },
+  worker: { seed: worker.seed, pubkey: worker.pub },
+  requester: { seed: requester.seed, pubkey: requester.pub },
 }
 
 const write = (f, o) => fs.writeFileSync(new URL(f, OUT), JSON.stringify(o, null, 2) + '\n')
